@@ -10,7 +10,7 @@ An automated service monitoring tool that reports failures to:
 
 Alarmageddon can monitor services via HHTP and/or SSH.
 
-```
+```python
 import alarmageddon
 from alarmageddon.validation import Priority
 from alarmageddon.validations.http import HttpValidation
