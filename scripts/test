@@ -1,0 +1,20 @@
+#! /bin/bash
+
+# scripts/run - runs Alarmageddon's unit tests.  Make sure these all
+#               pass before submitting pull requests.
+
+if [[ "$#" == "0" ]]
+then
+    tests=tests
+else
+    tests=$*
+fi
+
+if [[ ! -d ".venv" ]]
+then
+    echo "error: please run scripts/install first" 1>&2
+    exit 1
+fi
+
+.venv/bin/py.test -s ${tests}
+

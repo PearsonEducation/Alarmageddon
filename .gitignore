@@ -1,0 +1,14 @@
+*.pyc
+*.xml
+*.swp
+*~
+*.coverage
+
+.DS_Store
+.project
+.pydevproject
+
+Alarmageddon.egg-info/
+build/
+dist/
+.venv/

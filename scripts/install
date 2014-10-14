@@ -1,0 +1,49 @@
+#! /bin/bash
+
+# scripts/install - performs a clean install of Alarmageddon (deleting
+#                   any virtual environments and .pyc files that might
+#                   exist.  Unless you're modifying Alarmageddon's
+#                   dependencies, you should only have to run this
+#                   script once.  It does take a while to run because
+#                   it compiles a native crypto library.
+
+if [ $# == "1" ]
+then
+	install_location=$1
+else
+	install_location=.
+fi
+
+cd ${install_location}
+
+echo "installing to ${install_location}/"
+
+echo "cleaning up..."
+
+# delete all byte-compiled Python files to 
+# avoid hard-to-debug runtime errors
+echo "deleting byte-compiled python files..."
+find . -name '*.pyc' -delete
+
+for item in Alarmageddon.egg-info .venv dist build
+do
+if [ -d ${install_location}/${item} ]
+	then
+		echo "deleting directory: ${install_location}/${item}..."
+		rm -rf ${install_location}/${item}
+	fi
+done
+
+# create a new virtual environment for Alarmageddon
+virtualenv .venv
+
+# install Alarmageddon and most of its dependencies
+${install_location}/.venv/bin/python setup.py install
+
+# install additional dependencies (can these all be moved to setup.py?) 
+${install_location}/.venv/bin/pip install -r requirements.txt
+
+# now run the tests
+${install_location}/.venv/bin/py.test -s tests
+
+

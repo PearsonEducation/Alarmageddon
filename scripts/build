@@ -1,0 +1,28 @@
+#! /bin/bash
+#
+# scripts/build - if you make changes to Alarmageddon's source code,
+#                 running this script will make sure that those
+#                 changes are compiled and run via scripts/run
+
+if [ $# == "1" ]
+then
+	install_location=$1
+else
+	install_location=.
+fi
+
+cd ${install_location}
+
+echo "building in ${install_location}/"
+
+if [[ ! -d .venv ]]
+then
+    echo "error: please run scripts/install first" 1>&2
+    exit 1
+fi
+
+# install Alarmageddon and most of its dependencies
+${install_location}/.venv/bin/python setup.py install
+
+# install additional dependencies (can these all be moved to setup.py?) 
+${install_location}/.venv/bin/pip install -r requirements.txt
