@@ -1,4 +1,4 @@
-[Alarmageddon](logo.png)
+![Alarmageddon](logo.png)
 
 An automated service monitoring tool that reports failures to:
 
