@@ -1,7 +1,5 @@
 ![Alarmageddon](https://devops-tools.pearson.com/stash/projects/GAM/repos/alarmageddon/browse/logo.png?at=89f5cc1d6fc6be8da4b79e99711aaf896e91c6ed&raw)
 
-![Build Status](http://gambit-jenkins.prsn.us/job/alarmageddon-tests/badge/icon)
-
 An automated service monitoring tool that reports failures to:
 
 * HipChat
