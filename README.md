@@ -8,7 +8,7 @@ An automated service monitoring tool that reports failures to:
 * Email
 * XML file
 
-Alarmageddon can monitor services via HHTP and/or SSH.
+Alarmageddon can monitor services via HTTP and/or SSH.
 
 ```python
 import alarmageddon
