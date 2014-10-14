@@ -1,6 +1,3 @@
-![Alarmageddon](https://raw.githubusercontent.com/PearsonEducation/Alarmageddon/master/logo.png)
-![Alarmageddon](https://raw.github.com/PearsonEducation/Alarmageddon/master/logo.png)
-
 An automated service monitoring tool that reports failures to:
 
 * HipChat
