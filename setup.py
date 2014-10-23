@@ -22,5 +22,8 @@ setup(
                             "requests==2.0.0",
                             "statsd==2.0.3",
                             "colorama==0.3.2",
-                            "pika==0.9.13"],
-        )
+                            "pycrypto==2.6.1",
+                            "pika==0.9.13",
+                            "pytest>=2.4.0",
+                            "pytest-localserver==0.3.2"],
+    )
