@@ -104,7 +104,7 @@ class Validation(object):
         pass
 
     def fail(self, reason):
-        """Log the validation as a failure with pytest.
+        """Log the validation as a failure.
 
         :param reason: The cause of the failure.
         :param stack_track: Whether or not to include a stack trace in the
@@ -119,7 +119,7 @@ class Validation(object):
         The :py:class:`.reporter.Reporter` will check here before using
         the call time.
 
-        Overwrite this if you need more precise timing than pytest gives -
+        Overwrite this if you need more precise timing -
         eg, if you want to know how long an http request took, as opposed
         to how long that whole test took to execute.
 

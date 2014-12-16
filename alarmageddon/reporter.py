@@ -2,7 +2,7 @@
 
 
 class Reporter(object):
-    """Class for sending constructing and results to publishers.
+    """Class for collecting and sending results to publishers.
 
     :param publishers: List of
         :py:class:`~publisher.Publisher` objects to send results to.

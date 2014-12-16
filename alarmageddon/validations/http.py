@@ -170,7 +170,8 @@ class HttpValidation(Validation):
 
     def duplicate_with_hosts(self, host_names, port=None):
         """Returns a list of new HttpValidation that are identical to this
-        HttpValidation except the host name is now host_name.
+        HttpValidation except with the host name replaced by the
+        elements of host_names.
 
         """
         parts = urlparse.urlsplit(self._url)
