@@ -17,7 +17,6 @@ setup(
                     "alarmageddon.publishing",
                     "alarmageddon.validations"],
         install_requires = ["fabric==1.8.0",
-                            "pytest==2.4.2",
                             "Jinja2==2.7.2",
                             "requests==2.0.0",
                             "statsd==2.0.3",
