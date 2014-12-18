@@ -109,7 +109,7 @@ Please run the following to install virtualenv:
 
 This may be caused by a missing /usr/include directory.  This may be fixed by running:
 
-xcode-select --install
+    xcode-select --install
 
 ### Ubuntu
 
