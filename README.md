@@ -90,3 +90,31 @@ Creates a PagerDuty incident for each failed test.
 
 ### Email
 Sends emails on test failure. The SimpleEmailPublisher will email the text of the failure, while the EmailPublisher is highly configurable and can provide custom messages for individual validations.
+
+
+Troubleshooting
+===============
+
+### All Operating Systems
+
+#### virtualenv: command not found
+
+Please run the following to install virtualenv:
+
+    sudo pip install virtualenv
+
+### Mac OS 10
+
+#### c/_cffi_backend.c:13:10: fatal error: 'ffi.h' file not found
+
+This may be caused by a missing /usr/include directory.  This may be fixed by running:
+
+    xcode-select --install
+
+### Ubuntu
+
+#### fatal error: Python.h: No such file or directory
+
+Please run the following to install the python development libraries and header files:
+
+    sudo apt-get install python-dev
