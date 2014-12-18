@@ -10,6 +10,8 @@ An automated service monitoring tool that reports failures to:
 
 Alarmageddon can monitor services via HTTP and/or SSH.
 
+HTML documentation can be found on [Read the Docs](http://alarmageddon.readthedocs.org/en/latest/example.html).
+
 ```python
 import alarmageddon
 from alarmageddon.validation import Priority
