@@ -5,7 +5,7 @@ setup(
         version = "1.0.0",
         author = "Tim Stewart, Scott Hellman",
         author_email = "timothy.stewart@pearson.com, scott.hellman@pearson.com",
-        url = "https://github.com/PearsonEducation/Alarmageddon",
+        url = "https://github.com/PearsonEducation/Alarmageddon/tarball/1.0.0",
         license = "Apache2",
         classifiers=[
             "Development Status :: 5 - Production/Stable",
