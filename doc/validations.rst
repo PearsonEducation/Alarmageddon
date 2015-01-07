@@ -69,6 +69,13 @@ Cassandra validations are a special case of SSH validations::
 
     CassandraStatusValidation(ssh_ctx, hosts=['127.0.0.1'])
 
+Kafka
+-----
+
+Kafka validations will inspect your kafka partitions and leader elections. If a single partition has multiple leaders the validation will fail::
+
+    KafkaStatusValidation(ssh_ctx, zookeeper_nodes='127.0.0.1:2181,127.0.0.2:2181,127.0.0.3:2181',hosts=['127.0.0.1'])
+
 RabbitMQ
 --------
 
