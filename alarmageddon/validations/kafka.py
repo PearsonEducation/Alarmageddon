@@ -57,9 +57,8 @@ class KafkaStatusValidation(SshValidation):
       leaders = [parsed[i] for i in xrange(2, len(parsed), 5)]
 
       tuples = zip(topics, leaders)
-      print "tuples %s" % tuples
       duplicates = [x for x, y in Counter(tuples).items() if y > 1]
-      print "found dupes %s" % duplicates
+      
       if len(duplicates) != 0:
         self.fail_on_host(host, "Kafka partitions are out of sync. " + 
                           "Multiple partitons are the leader for the same replica. " +
