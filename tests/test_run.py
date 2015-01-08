@@ -31,11 +31,17 @@ def return_5():
     return 5
 
 
-def test_run_errors_without_config():
-    name = "http://thread-stats.qaprod.pearsonopenclass.com/version"
+def test_run_works_without_config():
+    name = "http://127.0.0.1/version"
     validation = HttpValidation.get(name)
-    with pytest.raises(ValueError):
-        run.run_tests([validation])
+    run.run_tests([validation])
+
+
+def test_run_works_with_config():
+    name = "http://127.0.0.1/version"
+    validation = HttpValidation.get(name)
+    run.run_tests([validation], config="config",
+                  config_path="path", environment_name="stg")
 
 
 def test_run_errors_without_valiations():

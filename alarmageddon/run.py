@@ -3,6 +3,7 @@
 import time
 import collections
 import multiprocessing
+import warnings
 
 from alarmageddon.config import Config
 from alarmageddon.reporter import Reporter
@@ -37,19 +38,31 @@ def run_tests(validations, publishers=None, config_path=None,
       that Alarmageddon will perform.
     :param publishers: List of :py:class:`~.publisher.Publisher`
       objects that Alarmageddon will publish validation results to.
-    :param config_path: Path to a JSON config file.
-    :param environment_name: The config environment that Alarmageddon will
-      run in.
-    :param config: A :py:class:`~config.Config` object that Alarmageddon
-      will use to configure itself.
     :param dry_run: When True, will prevent Alarmageddon from performing
       validations or publishing results, and instead will print which
       validations will be published by which publishers upon failure.
-    :processes: The number of worker processes to spawn. Does not run
+    :param processes: The number of worker processes to spawn. Does not run
       spawn additional processes if set to 1.
     :param print_banner: When True, print the Alarmageddon banner.
 
+    .. deprecated:: 1.0.0
+        These parameters are no longer used: *config_path*,
+        *environment_name*, *config*.
+        Configuration happens when constructing publishers instead.
+
     """
+
+    if config is not None:
+        warnings.warn("config keyword argument in run_tests is deprecated" + 
+                      " and has no effect.", DeprecationWarning)
+    if config_path is not None:
+        warnings.warn("config_path keyword argument in run_tests is" + 
+                      " deprecated and has no effect.", DeprecationWarning)
+    if environment_name is not None:
+        warnings.warn("environment_name keyword argument in run_tests is " + 
+                      "deprecated and has no effect.", DeprecationWarning)
+
+    
 
     publishers = publishers or []
     publishers.append(junit.JUnitPublisher("results.xml"))
@@ -59,15 +72,6 @@ def run_tests(validations, publishers=None, config_path=None,
     if not validations:
         raise ValueError("run_tests expected non-empty list of validations," +
                          "got {} instead".format(validations))
-
-    # Either use the config that was passed in or attempt to load the config
-    # ourselves.
-    if not config:
-        if config_path and environment_name:
-            config = load_config(config_path, environment_name)
-        else:
-            raise ValueError("Please specify either a Config object or " +
-                             "both a config_path and an environment_name")
 
     # Get rid of trailing c for byte-compiled .pyc files
     name = __file__
