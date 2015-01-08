@@ -5,7 +5,7 @@ Submodules
 ----------
 
 alarmageddon.validations.kafka module
------------------------------------
+-------------------------------------
 
 .. automodule:: alarmageddon.validations.kafka
     :members:
@@ -13,7 +13,7 @@ alarmageddon.validations.kafka module
     :show-inheritance:
 
 alarmageddon.validations.cassandra module
------------------------------------
+-----------------------------------------
 
 .. automodule:: alarmageddon.validations.cassandra
     :members:
