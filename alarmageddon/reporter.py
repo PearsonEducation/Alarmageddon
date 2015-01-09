@@ -11,12 +11,11 @@ class ReportingFailure(Exception):
 
     def __init__(self, failures):
         super(ReportingFailure, self).__init__(
-                "Reporter failed to publish.")
+                "{} publishing failure(s): ".format(len(failures)) +
+                ",".join((str(failure) for failure in failures)))
 
         self.failures = failures
 
-    def __str__(self):
-        return ",".join(self.failures)
 
 class Reporter(object):
     """Class for collecting and sending results to publishers.
