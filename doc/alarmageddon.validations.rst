@@ -4,8 +4,16 @@ alarmageddon.validations package
 Submodules
 ----------
 
+alarmageddon.validations.kafka module
+-------------------------------------
+
+.. automodule:: alarmageddon.validations.kafka
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 alarmageddon.validations.cassandra module
------------------------------------
+-----------------------------------------
 
 .. automodule:: alarmageddon.validations.cassandra
     :members:

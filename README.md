@@ -14,15 +14,16 @@ HTML documentation can be found on [Read the Docs](http://alarmageddon.readthedo
 
 ```python
 import alarmageddon
-from alarmageddon.validation import Priority
+from alarmageddon.validations.validation import Priority
 from alarmageddon.validations.http import HttpValidation
-from alarmageddon.publishers.hipchat import HipChatPublisher
+from alarmageddon.validations.ssh import SshCommandValidation
+from alarmageddon.publishing.hipchat import HipChatPublisher
 
 validations = []
 validations.append(HttpValidation.get("http://127.0.0.1").expect_status_codes([200]))
 validations.append(SshCommandValidation(ctx,"Cassandra","ps -ef | grep CassandraDaemon | grep -v 'grep'")
            .add_hosts(['127.0.0.1'])
-           .expect_output_contains("CassandraDaemon")
+           .expect_output_contains("CassandraDaemon"))
 
 publishers = []
 publishers.append(HipChatPublisher("127.0.0.1","token","stable","hipchat_room"))

@@ -1,5 +1,21 @@
 """Reports test results to registered publishers."""
 
+from publishing.exceptions import PublishFailure
+
+class ReportingFailure(Exception):
+    """An exception that aggregates multiple PublishFailures.
+
+    :param failures: A list of PublishFailures
+
+    """
+
+    def __init__(self, failures):
+        super(ReportingFailure, self).__init__(
+                "{} publishing failure(s): ".format(len(failures)) +
+                ",".join((str(failure) for failure in failures)))
+
+        self.failures = failures
+
 
 class Reporter(object):
     """Class for collecting and sending results to publishers.
@@ -23,5 +39,14 @@ class Reporter(object):
 
     def report(self):
         """Send reports to all publishers"""
+        errors = []
         for publisher in self.publishers:
-            publisher.send_batch(self._reports)
+            try:
+                publisher.send_batch(self._reports)
+            except PublishFailure,e:
+                #we don't want to block other publishers from publishing
+                #so just keep going for now
+                errors.append(e)
+
+        if errors:
+            raise ReportingFailure(errors)

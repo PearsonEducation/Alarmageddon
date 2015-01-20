@@ -20,13 +20,6 @@ alarmageddon.config module
     :undoc-members:
     :show-inheritance:
 
-alarmageddon.plugin module
---------------------------
-
-.. automodule:: alarmageddon.plugin
-    :members:
-    :undoc-members:
-    :show-inheritance:
 
 alarmageddon.reporter module
 ----------------------------
@@ -48,22 +41,6 @@ alarmageddon.run module
 -----------------------
 
 .. automodule:: alarmageddon.run
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-alarmageddon.utils module
--------------------------
-
-.. automodule:: alarmageddon.utils
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-alarmageddon.validation module
-------------------------------
-
-.. automodule:: alarmageddon.validation
     :members:
     :undoc-members:
     :show-inheritance:

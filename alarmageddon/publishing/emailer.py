@@ -28,7 +28,9 @@ def enrich(validation, email_settings, runtime_context=None):
          "email_type": "An environment-specific e-mail type as
                         defined in the email publisher config",
          "subject": "The name of the Jinja template for the e-mail subject",
+
          "body": "The name of the Jinja template for the e-mail body",
+
          "sender": "A dictionary of the form
                    {"real_name": "Real Name", "address": "email@address.com"}",
          "recipients": "An iterable of dicionaries of the form
