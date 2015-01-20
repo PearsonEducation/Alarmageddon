@@ -30,7 +30,7 @@ def print_banner(color=True):
         print(Fore.WHITE + "         " + Fore.MAGENTA + "_/ " + Fore.YELLOW + "@ @@" + Fore.MAGENTA + "_" + Fore.WHITE + "       |    |       " + 
               Fore.GREEN + "/  /\\  \__/   \ ")
         print(Fore.WHITE + "        " + Fore.MAGENTA + "/  " + Fore.YELLOW + "@   @" + Fore.MAGENTA + " \  " + Fore.WHITE + "   //    \\\\    " + 
-              Fore.GREEN + " " + Fore.WHITE + " VVV" + Fore.GREEN + "\\ \  \      \ ")
+              Fore.GREEN + " " + Fore.WHITE + " VVV" + Fore.GREEN + "\\ \  \      \ " + Fore.RESET)
         print("")
         print("Alarmageddon: Monitoring Your Stuff...")
         print("    Until You Don't Care About Your Stuff.")
