@@ -24,14 +24,14 @@ Creating Publishers
 
 Of course, if no one knows a validation has failed, it isn't particularly useful. To have Alarmageddon report on failures, we must supply it with at least one publisher::
 
-    from alarmageddon.publishers.hipchat import HipChatPublisher    
+    from alarmageddon.publishing.hipchat import HipChatPublisher    
 
     publishers = []
     hipchat_endpoint = "127.0.0.1"
     hipchat_token = "token"
     environment = "stable"
     room = "hipchat_room"
-    publishers.append(HipChatPublisher(hipchat_endpoint, hipchat_token, environment, room)
+    publishers.append(HipChatPublisher(hipchat_endpoint, hipchat_token, environment, room))
 
 This publisher will report failures to hipchat. Note that this example won't work - you'll need to supply a valid endpoint and token!
 
@@ -55,7 +55,7 @@ Here's the full source of this example::
 
     import alarmageddon
     from alarmageddon.validations.http import HttpValidation
-    from alarmageddon.publishers.hipchat import HipChatPublisher    
+    from alarmageddon.publishing.hipchat import HipChatPublisher    
 
     validations = []
     validations.append(HttpValidation.get("http://www.google.com").expect_status_codes([200]))
@@ -67,6 +67,6 @@ Here's the full source of this example::
     hipchat_token = "token"
     environment = "stable"
     room = "hipchat_room"
-    publishers.append(HipChatPublisher(hipchat_endpoint, hipchat_token, environment, room)
+    publishers.append(HipChatPublisher(hipchat_endpoint, hipchat_token, environment, room))
 
     alarmageddon.run_tests(validations,publishers)
