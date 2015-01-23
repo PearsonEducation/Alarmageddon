@@ -81,6 +81,10 @@ def _is_header_line(line):
     """
     return line.startswith('-- ')
 
+def _is_data_center_line(line):
+    """Determines if line introduces nodes from a Datacenter."""
+    return line.startswith('Datacenter: ')
+
 
 def _parse_status(text):
     """receives a Node Status (e.g. 'U' or 'D') and returns the
@@ -225,7 +229,10 @@ class NodetoolStatusParser(object):
         found_header = False
         nodes = []
         for line in status_output.split(os.linesep):
-            if _is_header_line(line):
+            if _is_data_center_line(line):
+                found_header = False
+                self.__headers = None
+            elif _is_header_line(line):
                 found_header = True
                 self.__headers = self.__parse_headers(line)
             elif found_header:

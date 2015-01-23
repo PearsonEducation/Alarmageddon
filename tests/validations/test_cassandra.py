@@ -361,3 +361,32 @@ def test_can_parse_minimal_output():
     parser = cassandra.NodetoolStatusParser()
     nodes = parser.parse(MINIMAL_OUTPUT)
     assert len(nodes) == 5
+
+MULTI_DATACENTER_OUTPUT="""xss =  -ea -javaagent:/usr/share/dse/cassandra/lib/jamm-0.2.5.jar -XX:+UseThreadPriorities -XX:ThreadPriorityPolicy=42 -Xms6G -Xmx6G -Xmn2G -XX:+HeapDumpOnOutOfMemoryError -Xss256k
+Note: Ownership information does not include topology; for complete information, specify a keyspace
+Datacenter: use1b
+=================
+Status=Up/Down
+|/ State=Normal/Leaving/Joining/Moving
+--  Address        Load       Tokens  Owns   Host ID                               Rack
+UN  10.168.252.216 244.65 MB  256     14.9%  0586776f-b4c2-4edc-8b67-afd02489a308  use1b-r
+UN  10.168.252.68  248.72 MB  256     18.8%  234c7abe-26e2-4d85-9e2f-7cf6b8f0bb33  use1b-r
+Datacenter: use1c
+=================
+Status=Up/Down
+|/ State=Normal/Leaving/Joining/Moving
+--  Address        Load       Tokens  Owns   Host ID                               Rack
+UN  10.168.253.83  249.26 MB  256     17.7%  570597ff-9ac0-41e5-9ee2-2e1fa27d75e6  use1c-r
+UN  10.168.253.50  244.58 MB  256     16.2%  f441bd1a-1227-488c-9e06-7f4ae476787b  use1c-r
+Datacenter: use1d
+=================
+Status=Up/Down
+|/ State=Normal/Leaving/Joining/Moving
+--  Address        Load       Tokens  Owns   Host ID                               Rack
+UN  10.168.249.83  247.17 MB  256     15.6%  bfb459e4-9897-47e6-aa17-7c0da370a475  use1d-r
+UN  10.168.249.26  247.45 MB  256     16.7%  6281b906-14f9-44f6-ae91-5109f5e5da86  use1d-r"""
+
+def test_can_parse_minimal_output():
+    parser = cassandra.NodetoolStatusParser()
+    nodes = parser.parse(MULTI_DATACENTER_OUTPUT)
+    assert len(nodes) == 6
