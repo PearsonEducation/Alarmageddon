@@ -422,7 +422,7 @@ class CassandraStatusValidation(SshValidation):
                                       Status.from_text(self.service_status)))
 
             # check for owns threshold
-            if node.owns:
+            if node.owns is not None:
                 if node.owns > self.owns_threshold:
                     self.fail_on_host(host,
                                       "Cassandra node {0} owns {1} " +
