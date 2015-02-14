@@ -67,4 +67,4 @@ class KafkaStatusValidation(SshValidation):
             self.fail_on_host(host, "Kafka partitions are out of sync. " +
                               "Multiple leaders for the same partition " +
                               "for the same replica: " +
-                              ", ".join(duplicates))
+                              ", ".join(str(dup) for dup in duplicates))
