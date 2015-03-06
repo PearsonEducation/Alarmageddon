@@ -332,8 +332,8 @@ class OutputContains(SshCommandExpectation):
     def validate(self, validation, host, command_output, exit_code):
         if self.text not in command_output:
             self.fail_on_host(host,
-                              "Command output should contain: '{0}'.  " +
-                              "Output: '{1}'"
+                              ("Command output should contain: '{0}'.  " +
+                              "Output: '{1}'")
                               .format(self.text, command_output))
 
 
@@ -349,8 +349,8 @@ class OutputDoesNotContain(SshCommandExpectation):
     def validate(self, validation, host, command_output, exit_code):
         if self.text in command_output:
             self.fail_on_host(host,
-                              "Command output should not contain: '{0}'.  " +
-                              "Output: '{1}'"
+                              ("Command output should not contain: '{0}'.  " +
+                              "Output: '{1}'")
                               .format(self.text, command_output))
 
 
