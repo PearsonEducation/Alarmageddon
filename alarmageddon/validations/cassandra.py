@@ -383,8 +383,8 @@ class CassandraStatusValidation(SshValidation):
         output = run('nodetool status')
 
         if "Exception" in output:
-            self.fail_on_host(host, "An exception occurred while " +
-                              "checking Cassandra cluster health on {0} ({1})"
+            self.fail_on_host(host, ("An exception occurred while " +
+                              "checking Cassandra cluster health on {0} ({1})")
                               .format((host, output)))
 
         parsed = NodetoolStatusParser().parse(output)
@@ -395,8 +395,8 @@ class CassandraStatusValidation(SshValidation):
         #Number of nodes check
         if len(nodes) < self.number_nodes:
             self.fail_on_host(host,
-                              "Cassandra cluster has {0} nodes but " +
-                              "should have {1} nodes."
+                              ("Cassandra cluster has {0} nodes but " +
+                              "should have {1} nodes.")
                               .format(len(nodes), self.number_nodes))
 
         # Validate each node's properties in nodetool's nodes
@@ -425,12 +425,12 @@ class CassandraStatusValidation(SshValidation):
             if node.owns is not None:
                 if node.owns > self.owns_threshold:
                     self.fail_on_host(host,
-                                      "Cassandra node {0} owns {1} " +
+                                      ("Cassandra node {0} owns {1} " +
                                       "percent of the ring which exceeds" +
-                                      "threashold of {3}"
+                                      "threashold of {3}")
                                       .format(node.ip_address, node.owns,
                                               self.owns_threshold))
             else:
                 self.fail_on_host(host,
-                                  "Expected nodetool to include an ownership " +
-                                  "percentage but got: {0}".format(node.owns))
+                                  ("Expected nodetool to include an ownership " +
+                                  "percentage but got: {0}").format(node.owns))
