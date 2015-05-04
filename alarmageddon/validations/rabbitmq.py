@@ -50,8 +50,8 @@ class RabbitMqValidation(Validation):
                  ignore_connection_failure=False):
         """Creates a RabbitMqValidation object."""
         super(RabbitMqValidation, self).__init__(
-            "queue '{0}' should have less than {1} messages in in " +
-            "it on RabbitMQ host: '{2}' ({3})"
+            ("queue '{0}' should have less than {1} messages in in " +
+            "it on RabbitMQ host: '{2}' ({3})")
             .format(queue_name, max_queue_size, rabbitmq_context.host, name),
             priority=priority, timeout=timeout, group=group)
 
