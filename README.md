@@ -94,6 +94,13 @@ Creates a PagerDuty incident for each failed test.
 ### Email
 Sends emails on test failure. The SimpleEmailPublisher will email the text of the failure, while the EmailPublisher is highly configurable and can provide custom messages for individual validations.
 
+Changelog
+=========
+1.0.2
+-----
+Update Cassandra validation to better handle different Cassandra versions.
+Fix string formatting on SSH, Cassandra, and RabbitMQ validation failures.
+
 
 Troubleshooting
 ===============
