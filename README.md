@@ -97,10 +97,8 @@ Sends emails on test failure. The SimpleEmailPublisher will email the text of th
 Changelog
 =========
 1.0.2
------
-Update Cassandra validation to better handle different Cassandra versions.
-Fix string formatting on SSH, Cassandra, and RabbitMQ validation failures.
-
+* Update Cassandra validation to better handle different Cassandra versions.
+* Fix string formatting on SSH, Cassandra, and RabbitMQ validation failures.
 
 Troubleshooting
 ===============
