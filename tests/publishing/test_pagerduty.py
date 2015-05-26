@@ -4,6 +4,7 @@ from alarmageddon.result import Failure
 from alarmageddon.result import Success
 from alarmageddon.publishing.exceptions import PublishFailure
 from alarmageddon.validations.validation import Validation, Priority
+import alarmageddon.validations.ssh as ssh
 import pytest
 
 
@@ -142,3 +143,23 @@ def test_generate_id_different_valid_different_id():
     failure = Failure("bar", v, "unable to transmogrify")
     another = Failure("foo", v2, "to transmogrify")
     assert pub._generate_id(failure) != pub._generate_id(another)
+
+def ssh_key_file(tmpdir):
+    tmp_file = tmpdir.join("secret.pem")
+    tmp_file.write('secret')
+    return tmp_file.strpath
+
+def test_generate_id_consistency_ssh(tmpdir):
+
+    pub = PagerDutyPublisher("url", "token")
+    ssh_ctx = ssh.SshContext("ubuntu", ssh_key_file(tmpdir))
+    ssh_ctx2 = ssh.SshContext("ubuntu", ssh_key_file(tmpdir))
+
+    v = ssh.SshCommandValidation(ssh_ctx, "name", "cmd", hosts=["a fake host"])
+    v2 = ssh.SshCommandValidation(ssh_ctx2, "name", "cmd", hosts=["a fake host"])
+
+    failure = Failure("bar", v, "unable to transmogrify")
+    another = Failure("foo", v2, "to transmogrify")
+
+    assert pub._generate_id(failure) == pub._generate_id(another)
+
