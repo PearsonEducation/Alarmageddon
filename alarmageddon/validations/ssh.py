@@ -41,6 +41,9 @@ class SshContext(object):
         """return a string representation of an SshContext object"""
         return "SSH Context {{ User: {0}, Key File: {1} }}"\
             .format(self.user, self.key_file)
+    
+    def __repr__(self):
+        return "{}:{}".format(self.user, self.key_file)
 
 
 class SshValidation(Validation):
@@ -321,6 +324,9 @@ class _ExitCodeEquals(SshCommandExpectation):
             self.fail_on_host(host,
                               "Exit Code should have been {0} but was {1}"
                               .format(self.exit_code, exit_code))
+
+    def __repr__(self):
+        return "{}:Code {}".format(type(self).__name__, self.exit_code)
 
 
 class OutputContains(SshCommandExpectation):

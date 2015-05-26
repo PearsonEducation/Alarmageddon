@@ -51,6 +51,7 @@ class PagerDutyPublisher(Publisher):
         #this is still not optimal - validations may mutate between creation
         #and here
         message = str(type(validation)) + str(validation.__dict__)
+        print message
         hasher = hashlib.md5()
         hasher.update(message)
         pagerduty_id = hasher.hexdigest()
