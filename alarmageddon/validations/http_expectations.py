@@ -39,6 +39,9 @@ class _ExpectedStatusCodes(ResponseExpectation):
                 "expected status code: {0}, actual status code: {1} ({2})"
                 .format(string_code, response.status_code, response.reason))
 
+    def __repr__(self):
+        return "{}: Code {}".format(type(self).__name__, self.status_codes)
+
 
 class ExpectContainsText(ResponseExpectation):
     """An expectation that an HTTP response will include some text."""
@@ -54,6 +57,9 @@ class ExpectContainsText(ResponseExpectation):
         if not self.text in response.text:
             validation.fail("could not find '{0}' in response body: '{1}'"
                             .format(self.text, response.text))
+
+    def __repr__(self):
+        return "{}: expect {}".format(type(self).__name__, self.text)
 
 
 class ExpectedHeader(ResponseExpectation):
@@ -76,6 +82,9 @@ class ExpectedHeader(ResponseExpectation):
             validation.fail(
                 "The value of the '{0}' header is '{1}', expected '{2}'"
                 .format(self.name, response.headers[self.name], self.value))
+
+    def __repr__(self):
+        return "{}: {} should be {}".format(type(self).__name__, self.name, self.value)
 
 
 class ExpectedContentType(ExpectedHeader):

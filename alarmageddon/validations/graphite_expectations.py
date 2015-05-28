@@ -84,6 +84,9 @@ class GreaterThanExpectation(GraphiteExpectation):
         self._validate([x for x in readings if x is not None and
                         x <= self._lower_bound], False)
 
+    def __repr__(self):
+        return "{}: all > {} on {}".format(type(self).__name__, self._lower_bound, self._validation)
+
 
 class LessThanExpectation(GraphiteExpectation):
     """Expect that a graphite metric is less than than a specified number"""
@@ -96,6 +99,9 @@ class LessThanExpectation(GraphiteExpectation):
     def validate(self, readings, time_range):
         self._validate([x for x in readings if x is not None and
                         x >= self._upper_bound], True)
+
+    def __repr__(self):
+        return "{}: all < {} on {}".format(type(self).__name__, self._upper_bound, self._validation)
 
 
 class AverageGreaterThanExpectation(GraphiteExpectation):
@@ -114,6 +120,9 @@ class AverageGreaterThanExpectation(GraphiteExpectation):
         average = _avg([x for x in readings if x is not None])
         self._validate_avg(average, average <= self._lower_bound)
 
+    def __repr__(self):
+        return "{}: average > {} on {}".format(type(self).__name__, self._upper_bound, self._validation)
+
 
 class AverageLessThanExpectation(GraphiteExpectation):
     """Expect that the average of a graphite metric is less than a
@@ -130,3 +139,6 @@ class AverageLessThanExpectation(GraphiteExpectation):
     def validate(self, readings, time_range):
         average = _avg([x for x in readings if x is not None])
         self._validate_avg(average, average >= self._upper_bound)
+
+    def __repr__(self):
+        return "{}: average < {} on {}".format(type(self).__name__, self._upper_bound, self._validation)

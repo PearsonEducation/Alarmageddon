@@ -25,6 +25,9 @@ class GraphiteContext(object):
         """returns the Graphite host name"""
         return self._graphite_host
 
+    def __repr__(self):
+        return "{}: {}".format(type(self).__name__, self._graphite_host)
+
 
 class GraphiteValidation(Validation):
     """A Validation that queries Graphite for data and then validates any

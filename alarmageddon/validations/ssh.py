@@ -43,7 +43,7 @@ class SshContext(object):
             .format(self.user, self.key_file)
     
     def __repr__(self):
-        return "{}:{}".format(self.user, self.key_file)
+        return "{}: {} {}".format(type(self).__name__, self.user, self.key_file)
 
 
 class SshValidation(Validation):
@@ -309,6 +309,9 @@ class SshCommandExpectation(object):
         """Report a failure and the host the failure occurred on"""
         self.validation.fail_on_host(host, reason)
 
+    def __repr__(self):
+        return "{}: on {}".format(type(self).__name__, self.validation)
+
 
 class _ExitCodeEquals(SshCommandExpectation):
     """Expects that the exit code of an SSH command is equal to a
@@ -326,7 +329,7 @@ class _ExitCodeEquals(SshCommandExpectation):
                               .format(self.exit_code, exit_code))
 
     def __repr__(self):
-        return "{}:Code {}".format(type(self).__name__, self.exit_code)
+        return "{}:Code {} on {}".format(type(self).__name__, self.exit_code, self.validation)
 
 
 class OutputContains(SshCommandExpectation):
@@ -341,6 +344,9 @@ class OutputContains(SshCommandExpectation):
                               ("Command output should contain: '{0}'.  " +
                               "Output: '{1}'")
                               .format(self.text, command_output))
+
+    def __repr__(self):
+        return "{}:Expect {} on {}".format(type(self).__name__, self.text, self.validation)
 
 
 class OutputDoesNotContain(SshCommandExpectation):
@@ -358,6 +364,9 @@ class OutputDoesNotContain(SshCommandExpectation):
                               ("Command output should not contain: '{0}'.  " +
                               "Output: '{1}'")
                               .format(self.text, command_output))
+
+    def __repr__(self):
+        return "{}:Do not expect {} on {}".format(type(self).__name__, self.text, self.validation)
 
 
 class OutputLessThan(SshCommandExpectation):
@@ -377,6 +386,9 @@ class OutputLessThan(SshCommandExpectation):
                               "expected: '{0}'.  Output: '{1}'"
                               .format(self.value, str(command_output)))
 
+    def __repr__(self):
+        return "{}:Value < {} on {}".format(type(self).__name__, self.value, self.validation)
+
 
 class OutputGreaterThan(SshCommandExpectation):
     """Expects that the output of an SSH command is greater than the
@@ -394,6 +406,9 @@ class OutputGreaterThan(SshCommandExpectation):
                               "Command output was less than or equal to " +
                               "expected: '{0}'.  Output: '{1}'"
                               .format(self.value, command_output))
+
+    def __repr__(self):
+        return "{}:Value > {} on {}".format(type(self).__name__, self.value, self.validation)
 
 
 UPTIME_REGEX = re.compile(r"load average: (\d+\.\d+), (\d+\.\d+), (\d+\.\d+)")

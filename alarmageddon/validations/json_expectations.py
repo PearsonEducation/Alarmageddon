@@ -38,6 +38,9 @@ class ExpectedJsonPredicate(ResponseExpectation):
         """validates a JSON value"""
         validation.fail("validate_value must be overriden by derived classes")
 
+    def __repr__(self):
+        return "{}: {} should be {}".format(type(self).__name__, self.json_property_path, self.value)
+
 
 class ExpectedJsonEquality(ExpectedJsonPredicate):
     """expects that a JSON value is equal to a specified value"""
@@ -49,6 +52,9 @@ class ExpectedJsonEquality(ExpectedJsonPredicate):
             validation.fail(
                 "expected JSON property {0} to be '{1}', actual value: '{2}'"
                 .format(self.json_property_path, expected_value, actual_value))
+
+    def __repr__(self):
+        return "{}: {} should be {}".format(type(self).__name__, self.json_property_path, self.value)
 
 
 class ExpectedJsonValueLessThan(ExpectedJsonPredicate):
@@ -67,6 +73,9 @@ class ExpectedJsonValueLessThan(ExpectedJsonPredicate):
                                     float(expected_value),
                                     float(actual_value)))
 
+    def __repr__(self):
+        return "{}: {} < {}".format(type(self).__name__, self.json_property_path, self.value)
+
 
 class ExpectedJsonValueGreaterThan(ExpectedJsonPredicate):
     """Expects that a numeric JSON value is greater than a specified value"""
@@ -83,6 +92,9 @@ class ExpectedJsonValueGreaterThan(ExpectedJsonPredicate):
                             .format(self.json_property_path,
                                     float(expected_value),
                                     float(actual_value)))
+
+    def __repr__(self):
+        return "{}: {} > {}".format(type(self).__name__, self.json_property_path, self.value)
 
 
 INDEXED_ARRAY = re.compile(r"([^[]+)\[(\d+)\]")
