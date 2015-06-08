@@ -107,6 +107,8 @@ class SimpleEmailPublisher(Publisher):
         # Set the initial replacement context to the defaults.
         # Overrides will be applied to this dictionary individually.
         self._connect_timeout = connect_timeout_seconds
+        self.sender_address = None
+        self.recipient_addresses = []
         if sender_address:
             self.sender_address = self.configure_sender(sender_address)
         if recipient_addresses:
@@ -118,7 +120,8 @@ class SimpleEmailPublisher(Publisher):
     def __repr__(self):
         return "{}: sender {}, recipient {}, host {}, port {}, timeout {}".format(
                     type(self).__name__, self.sender_address,
-                    self.recipient_addresses, self.host, self.port)
+                    self.recipient_addresses, self.host, self.port,
+                    self._connect_timeout)
 
     def send(self, result):
         """Constructs a message from a result and send it as an email.
