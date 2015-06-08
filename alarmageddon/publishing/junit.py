@@ -21,6 +21,10 @@ class JUnitPublisher(Publisher):
 
         self.filename = filename
 
+    def __repr__(self):
+        return "JUnit, publishes to {} (threshold: {})".format(
+                self.filename, self.priority_threshold)
+
     def send_batch(self, results):
         """Write a set of results to an XML file.
 

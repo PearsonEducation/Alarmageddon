@@ -115,6 +115,11 @@ class SimpleEmailPublisher(Publisher):
         self.host = host
         self.port = port
 
+    def __repr__(self):
+        return "{}: sender {}, recipient {}, host {}, port {}, timeout {}".format(
+                    type(self).__name__, self.sender_address,
+                    self.recipient_addresses, self.host, self.port)
+
     def send(self, result):
         """Constructs a message from a result and send it as an email.
 
@@ -284,6 +289,12 @@ class EmailPublisher(SimpleEmailPublisher):
         else:
             self._email_notifications_config_key = \
                 email_notifications_config_key
+
+    def __repr__(self):
+        return "{}: replacement {}, config {}, env {}, timeout {}, key {}".format(
+                    type(self).__name__, self._replacement_context, self._config,
+                    self._template_environment, self._connect_timeout,
+                    self._email_notifications_config_key)
 
     def send(self, result):
         """Constructs a message from a result and send it as an email.

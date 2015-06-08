@@ -24,7 +24,7 @@ class PublishFailure(Exception):
         """Returns the publisher that could not be published to."""
         return self._publisher
 
-    def __str__(self):
+    def __repr__(self):
         return "Could not publish {0} to {1}".format(self._result,
                                                      self._publisher)
 
@@ -63,7 +63,7 @@ class EnrichmentFailure(Exception):
         """Returns the enrichment values."""
         return self._values
 
-    def __str__(self):
+    def __repr__(self):
         return "Could not enrich {} with {} (for {}). Validation contained" +\
                "these enriched fields at time of failure:" +\
                "{}".format(self._validation,

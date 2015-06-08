@@ -59,5 +59,8 @@ class Config(dict):
 
     def __str__(self):
         """Return a string representation of this Config object"""
+        return self.__repr__()
+
+    def __repr__(self):
         return "Current Environment: %s Dictionary: %s" % (
             self._environment_name, dict.__str__(self))

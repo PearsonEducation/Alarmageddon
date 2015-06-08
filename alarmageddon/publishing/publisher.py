@@ -39,7 +39,7 @@ class Publisher(object):
         for result in results:
             self.send(result)
 
-    def __str__(self):
+    def __repr__(self):
         return "Publisher: '{}'".format(self._name)
 
     def will_publish(self, result):

@@ -155,7 +155,7 @@ class HttpPublisher(Publisher):
             if not published:
                 raise PublishFailure(self, result)
 
-    def __str__(self):
+    def __repr__(self):
         """Returns a string representation of this HttpPublisher"""
         return "HttpPublisher: '{0}', Method: {1}, Success URL: {2}," +\
                 "Failure URL: {3}".format(self._name, self._method,

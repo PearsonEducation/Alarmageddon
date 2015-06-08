@@ -50,3 +50,6 @@ class Reporter(object):
 
         if errors:
             raise ReportingFailure(errors)
+
+    def __repr__(self):
+        return "Reporter: {} {}".format(self.publishers, self._reports)

@@ -60,6 +60,17 @@ class HipChatPublisher(Publisher):
         self._room_name = room_name
         self._environment = environment
 
+    def __str__(self):
+        return "Hipchat: {}, room {}, env {}".format(
+                self._api_end_point, self._room_name, self._environment
+                )
+
+    def __repr__(self):
+        return "Hipchat: {} ({}), room {}, env {}".format(
+                self._api_end_point, self._api_token,
+                self._room_name, self._environment
+                )
+
     def send_batch(self, results):
         """Send a batch of results to HipChat.
 

@@ -61,3 +61,9 @@ class GraphitePublisher(Publisher):
                 self._graphite.incr(self._passed_tests_counter)
             if result.timer_name:
                 self._graphite.gauge(result.timer_name, result.time)
+
+    def __repr__(self):
+        return "Graphite Publisher: {}:{} with prefix {} ({}/{}). {}".format(
+                    self._host, self._port, self._prefix,
+                    self._failed_tests_counter, self._passed_tests_counter,
+                    self._graphite)

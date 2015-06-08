@@ -34,6 +34,14 @@ class PagerDutyPublisher(Publisher):
         self._api_key = api_key
         self._api_end_point = api_end_point
 
+    def __str__(self):
+        return "Pagerduty: {} ({})".format( self._api_end_point,
+                self.priority_threshold)
+
+    def __repr__(self):
+        return "Pagerduty: {} ({}) ({})".format( self._api_end_point,
+                self._api_key, self.priority_threshold)
+
     def _generate_id(self, result):
         """Generate a unique ID for a result.
 
