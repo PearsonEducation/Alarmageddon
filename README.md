@@ -33,6 +33,13 @@ alarmageddon.run_tests(validations,publishers)
 
 Pull requests welcome!
 
+Installation
+============
+Alarmageddon can be installed via pip:
+```shell
+pip install alarmageddon
+```
+
 Validations
 ======
 
