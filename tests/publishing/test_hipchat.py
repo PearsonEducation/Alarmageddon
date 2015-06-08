@@ -53,6 +53,11 @@ def test_requires_room():
                          room_name="")
 
 
+def test_repr():
+    hipchat = new_publisher()
+    hipchat.__repr__()
+
+
 def testSendSuccess(no_post, monkeypatch):
     hipchat = new_publisher()
     v = Validation("low", priority=Priority.LOW)

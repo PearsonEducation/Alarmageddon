@@ -10,6 +10,11 @@ def test_requires_filename():
         JUnitPublisher(None)
 
 
+def test_repr():
+    pub = JUnitPublisher("should_not_be_created.xml")
+    pub.__repr__()
+
+
 def test_send_fails():
     pub = JUnitPublisher("should_not_be_created.xml")
     v = Validation("low", priority=Priority.CRITICAL)

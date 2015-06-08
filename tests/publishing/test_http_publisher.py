@@ -166,6 +166,11 @@ def test_success_and_failure_urls_are_set():
     assert publisher._failure_url == "both"
 
 
+def test_rep():
+    publisher = HttpPublisher(url="both")
+    publisher.__repr__()
+
+
 def test_publish_success_if_success_url_is_given():
     publisher = HttpPublisher(success_url="success", failure_url="failure")
 

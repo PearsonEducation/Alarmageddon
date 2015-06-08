@@ -303,3 +303,13 @@ def test_output_correct_on_ssh_failure(monkeypatch, tmpdir):
                                               hosts=hosts)
         validation.add_expectation(ssh.OutputLessThan(validation, 90))
         validation.perform({})
+
+
+def test_repr(monkeypatch, tmpdir):
+    t = "18:01:46 up 62 days, 18:27,  1 user,  load average: 0.09, 0.04, 0.05"
+    monkeypatch.setattr(ssh, "run",
+                        lambda x, combine_stderr, timeout: get_mock_ssh_text(t, 0))
+    ssh_ctx = ssh.SshContext("ubuntu", get_mock_key_file(tmpdir))
+
+    (ssh.SshCommandValidation(ssh_ctx, "name", "cmd", hosts=hosts)
+     .__repr__())

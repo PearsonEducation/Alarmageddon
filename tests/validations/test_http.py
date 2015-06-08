@@ -23,6 +23,12 @@ def pytest_funcarg__slowserver(request):
     return server
 
 
+def test_repr():
+    name = "http://thread-stats.qaprod.pearsonopenclass.com/version"
+    validation = HttpValidation.get(name)
+    validation.__repr__()
+
+
 def test_http_name_get():
     name = "http://thread-stats.qaprod.pearsonopenclass.com/version"
     validation = HttpValidation.get(name)

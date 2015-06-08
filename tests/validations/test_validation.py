@@ -52,6 +52,11 @@ def test_validation_str():
     v.__str__()
 
 
+def test_repr():
+    v = Validation("name")
+    v.__repr__()
+
+
 def test_group_validation_correct_thresholds(lows, normals, criticals):
     v = GroupValidation("name", "group", low_threshold=lows,
                         normal_threshold=normals, critical_threshold=criticals)

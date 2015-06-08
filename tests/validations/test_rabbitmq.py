@@ -27,6 +27,11 @@ def no_connect(monkeypatch):
     monkeypatch.setattr(RabbitMqValidation, "_connect",
                         lambda self: (None, MockChannel(200)))
 
+def test_repr():
+    context = RabbitMqContext("host", 88, "name", "password")
+    (RabbitMqValidation(context, "name", "queue", 500)
+     .__repr__())
+
 
 def test_expected_queue_size():
     context = RabbitMqContext("host", 88, "name", "password")

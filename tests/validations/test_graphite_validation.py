@@ -12,6 +12,14 @@ def establishServer(httpserver, counts):
                              content=content)
 
 
+def test_repr(httpserver):
+    establishServer(httpserver, "None,10,None,30,45,None,None")
+    ctx = GraphiteContext(httpserver.url)
+    v = GraphiteValidation(ctx, "ParticipationIndex Internal Server Errors",
+                       "ParticipationIndex.404-Not-Found-count.count")
+    v.__repr__()
+
+
 def test_detect_max_exceeded(httpserver):
     establishServer(httpserver, "None,10,None,30,45,None,None")
     ctx = GraphiteContext(httpserver.url)

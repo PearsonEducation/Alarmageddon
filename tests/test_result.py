@@ -5,6 +5,12 @@ from alarmageddon.validations.validation import Validation, Priority
 from alarmageddon.result import TestResult as ValidResult
 
 
+def test_repr():
+    v = Validation("low", priority=Priority.LOW)
+    r = ValidResult("name", v)
+    r.__repr__()
+    
+
 def test_failures_are_failures():
     v = Validation("low", priority=Priority.LOW)
     f = Failure("name", v, "desc")

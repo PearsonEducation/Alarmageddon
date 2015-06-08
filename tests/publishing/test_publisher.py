@@ -12,6 +12,11 @@ def result(request):
     return request.param
 
 
+def test_repr(result):
+    pub = publisher.Publisher(priority_threshold=Priority.CRITICAL)
+    pub.__repr__()
+
+
 def test_should_publish_high(result):
     pub = publisher.Publisher(priority_threshold=Priority.CRITICAL)
     should = pub._should_publish(result)

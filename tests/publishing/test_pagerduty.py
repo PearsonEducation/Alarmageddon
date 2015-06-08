@@ -62,6 +62,11 @@ def test_requires_api_key():
             api_key="")
 
 
+def test_repr(no_post):
+    pager = new_publisher()
+    pager.__repr__()
+
+
 def testSendSuccess(no_post):
     pager = new_publisher()
     v = Validation("low", priority=Priority.CRITICAL)

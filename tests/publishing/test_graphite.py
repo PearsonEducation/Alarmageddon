@@ -34,6 +34,9 @@ def test_requires_host():
     with pytest.raises(ValueError):
         GraphitePublisher(host=None, port=None)
 
+def test_repr():
+    graphite = new_publisher()
+    graphite.__repr__()
 
 def test_send_success():
     graphite = new_publisher()

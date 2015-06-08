@@ -415,3 +415,15 @@ def test_zero_ownership_should_not_fail(monkeypatch, tmpdir):
 
     (cassandra.CassandraStatusValidation(ssh_ctx, hosts=["127.0.0.1"])
      .perform({}))
+
+
+def test_repr(monkeypatch, tmpdir):
+    ssh_ctx = ssh.SshContext("ubuntu", get_mock_key_file(tmpdir))
+    text = ZERO_OWNERSHIP_OUTPUT
+    monkeypatch.setattr(ssh, "run",
+                        lambda x: get_mock_ssh_text(text, 0))
+    monkeypatch.setattr(cassandra, "run",
+                        lambda x: get_mock_ssh_text(text, 0))
+
+    (cassandra.CassandraStatusValidation(ssh_ctx, hosts=["127.0.0.1"])
+     .__repr__())
