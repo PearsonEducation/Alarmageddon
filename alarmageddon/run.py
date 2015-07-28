@@ -4,6 +4,7 @@ import time
 import collections
 import multiprocessing
 import warnings
+import threading
 
 from alarmageddon.config import Config
 from alarmageddon.reporter import Reporter
@@ -26,7 +27,7 @@ def load_config(config_path, environment_name):
 
 def run_tests(validations, publishers=None, config_path=None,
               environment_name=None, config=None, dry_run=False,
-              processes=1, print_banner=True):
+              processes=1, print_banner=True, timeout=60):
     """Main entry point into Alarmageddon.
 
     Run the given validations and report them to given publishers.
@@ -41,9 +42,10 @@ def run_tests(validations, publishers=None, config_path=None,
     :param dry_run: When True, will prevent Alarmageddon from performing
       validations or publishing results, and instead will print which
       validations will be published by which publishers upon failure.
-    :param processes: The number of worker processes to spawn. Does not run
-      spawn additional processes if set to 1.
+    :param processes: The number of worker processes to spawn. 
     :param print_banner: When True, print the Alarmageddon banner.
+    :timeout: If a validation runs for longer than this number of seconds,
+      Alarmageddon will kill the process running it.
 
     .. deprecated:: 1.0.0
         These parameters are no longer used: *config_path*,
@@ -86,10 +88,10 @@ def run_tests(validations, publishers=None, config_path=None,
 
     if not dry_run:
         # run all of the tests
-        _run_validations(validations, Reporter(publishers), processes)
+        _run_validations(validations, Reporter(publishers), processes, timeout)
 
 
-def _run_validations(validations, reporter, processes):
+def _run_validations(validations, reporter, processes=1, timeout=60):
     """ Run the given validations and publish the results
 
     Sort validations by order and then run them. All results are logged
@@ -103,12 +105,10 @@ def _run_validations(validations, reporter, processes):
       publishers.
     :processes: The number of worker processes to spawn. Does not run
       spawn additional processes if set to 1.
+    :timeout: If a validation runs for longer than this number of seconds,
+      Alarmageddon will kill the process running it.
 
     """
-    if processes > 1:
-        pool = multiprocessing.Pool(processes)
-    else:
-        pool = None
     order_dict = collections.defaultdict(list)
     for validation in validations:
         order_dict[validation.order].append(validation)
@@ -121,15 +121,26 @@ def _run_validations(validations, reporter, processes):
                 validation.group not in group_failures):
             group_failures[validation.group] = []
 
+    
+    manager = multiprocessing.Manager()
+    results = manager.list()
     for order_set in ordered_validations:
+        print group_failures
         immutable_group_failures = dict(group_failures)
-        wrapped = [(valid, immutable_group_failures) for valid in order_set]
-        if pool is None:
-            results = map(_parallel_perform, wrapped)
-        else:
-            #map can't handle unpickleable validations
-            #asynch with get is so we can handle ctrl-c
-            results = pool.map_async(_parallel_perform, wrapped).get(999999)
+        for valid in order_set:
+            #TODO: parallelize
+            p = multiprocessing.Process(target=_perform, args=(valid, immutable_group_failures, results))
+            p.start()
+            p.join(timeout)
+            if p.is_alive():
+                #job is taking too long, kill it
+                #this is messy, but we assume that if something hit the 
+                #general alarmageddon timeout, then it's stuck somewhere
+                #and we can't stop it nicely
+                p.terminate()
+                results.append(Failure(valid.name, valid,
+                                       "{} failed to terminate (ran for {}s)".format(valid,timeout),
+                                       time=timeout))
         for result in results:
             if result.is_failure() and result.validation.group is not None:
                 group_failures[result.validation.group].append(result.description())
@@ -142,7 +153,7 @@ def _parallel_perform(wrapped_info):
     return _perform(*wrapped_info)
 
 
-def _perform(validation, immutable_group_failures):
+def _perform(validation, immutable_group_failures, results):
     start = time.time()
     try:
         validation.perform(immutable_group_failures)
@@ -156,7 +167,8 @@ def _perform(validation, immutable_group_failures):
     except NotImplementedError:
         pass
 
-    return result
+    #appending is atomic
+    results.append(result)
 
 
 def do_dry_run(validations, publishers):
