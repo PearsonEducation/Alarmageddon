@@ -1,6 +1,7 @@
 import pytest
 import alarmageddon.reporter
 from alarmageddon.validations.validation import Priority, Validation
+import time
 
 
 class MockPublisher:
@@ -107,3 +108,8 @@ validations = [Validation("low", priority=Priority.LOW),
 @pytest.fixture(params=validations)
 def valid(request):
     return MockItem(request.param.name, {"test_info": (request.param, {})})
+
+class NeverFinish(Validation):
+    #don't actually never finish, that would be bad if we don't handle it well
+    def perform(self, group_failures):
+        time.sleep(15)

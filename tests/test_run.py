@@ -171,3 +171,23 @@ def test_run_validations_sets_time_with_function_if_available(env, processes):
     validation.get_elapsed_time = return_5
     run._run_validations([validation], reporter, processes)
     assert reporter._reports[0].time == 5
+
+def test_run_validations_enforces_global_timeout(env, processes):
+    timeout = 5
+    reporter = env["reporter"]
+    publishers = [MockPublisher()]
+    reporter.publishers = publishers
+    validation = NeverFinish("never finishes")
+    run._run_validations([validation], reporter, processes, timeout)
+    assert reporter._reports[0].is_failure()
+    assert reporter._reports[0].time == timeout
+
+def test_run_validations_without_timeout_hangs(env, processes):
+    #this test just verifies NeverFail behaves as we expect
+    timeout = 60
+    reporter = env["reporter"]
+    publishers = [MockPublisher()]
+    reporter.publishers = publishers
+    validation = NeverFinish("shouldn't finish but will")
+    run._run_validations([validation], reporter, processes, timeout)
+    assert not reporter._reports[0].is_failure()
