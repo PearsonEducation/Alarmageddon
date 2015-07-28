@@ -124,7 +124,6 @@ def _run_validations(validations, reporter, processes=1, timeout=60):
     
     manager = multiprocessing.Manager()
     for order_set in ordered_validations:
-        print group_failures
         immutable_group_failures = dict(group_failures)
         results = manager.list()
         for valid in order_set:
