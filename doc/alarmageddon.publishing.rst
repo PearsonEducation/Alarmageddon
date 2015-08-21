@@ -36,6 +36,14 @@ alarmageddon.publishing.hipchat module
     :undoc-members:
     :show-inheritance:
 
+alarmageddon.publishing.slack module
+--------------------------------------
+
+.. automodule:: alarmageddon.publishing.slack
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 alarmageddon.publishing.http module
 -----------------------------------
 
@@ -43,7 +51,7 @@ alarmageddon.publishing.http module
     :members:
     :undoc-members:
     :show-inheritance:
-       
+
 alarmageddon.publishing.pagerduty module
 ----------------------------------------
 

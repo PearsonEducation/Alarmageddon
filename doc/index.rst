@@ -33,6 +33,7 @@ Features
 * Report failed verifications to
 
   * HipChat
+  * Slack
   * PagerDuty
   * Graphite
   * Email
@@ -65,4 +66,3 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
-
