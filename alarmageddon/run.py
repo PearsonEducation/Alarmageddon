@@ -4,7 +4,6 @@ import time
 import collections
 import multiprocessing
 import warnings
-import threading
 
 from alarmageddon.config import Config
 from alarmageddon.reporter import Reporter
@@ -74,11 +73,6 @@ def run_tests(validations, publishers=None, config_path=None,
     if not validations:
         raise ValueError("run_tests expected non-empty list of validations," +
                          "got {} instead".format(validations))
-
-    # Get rid of trailing c for byte-compiled .pyc files
-    name = __file__
-    if name[-1] == 'c':
-        name = name[:-1]
 
     if print_banner:
         banner.print_banner(True)
