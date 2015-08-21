@@ -1,7 +1,7 @@
 Publishers
 ==========
 
-All publishers accept a ``priority_threshold`` argument. This should be one of ``Priority.LOW``, ``Priority.NORMAL``, or ``Priority.CRITICAL``. 
+All publishers accept a ``priority_threshold`` argument. This should be one of ``Priority.LOW``, ``Priority.NORMAL``, or ``Priority.CRITICAL``.
 A publisher will only publish failing validations if they are at least as critical as the ``priority_threshold``. For example, to report on all failures, you should set your publisher's ``priority_threshold`` to ``Priority.LOW``.
 
 JUnit XML
@@ -17,6 +17,17 @@ The HipChat publisher will report failures to your hipchat room::
     HipChatPublisher("hipchat.route.here","token","stable","hipchat_room")
 
 By default, the HipChat publisher alerts on failures of NORMAL priority or higher.
+
+Slack
+-------
+
+The Slack publisher will report failures to your slack channel::
+
+    SlackPublisher("hook.url","stable")
+
+``hook.url`` should be a slack `incoming web hook <https://my.slack.com/services/new/incoming-webhook/>`_ integration
+to the channel that should be published to.
+By default, the Slack publisher alerts on failures of NORMAL priority or higher.
 
 Http
 ----
@@ -55,7 +66,7 @@ There are two email publishers. SimpleEmailPublisher provides basic emailing fun
 EmailPublisher provides more granular control over the sent messages. For this reason, validations that will be published by the email publisher must be enriched with extra information.
 
 To create an email publisher, you need a config object with the appropriate values in it, and optionally a set of defaults for missing config values::
-  
+
   email_pub = EmailPublisher(config, defaults=general_defaults)
 
 For enrichment, a convenience method is provided in emailer to ensure that the appropriate value are present::
@@ -64,4 +75,3 @@ For enrichment, a convenience method is provided in emailer to ensure that the a
 
 .. note::
   For the email publisher to publish a failure, the priority threshold must be reached **and** the validation must be enriched.
-
