@@ -56,8 +56,7 @@ class SlackPublisher(Publisher):
         """sends a result to Slack if the result is a faliure."""
         if result.is_failure() and self.will_publish(result):
 
-            message = "(failed) Failure in {0}\nTest:{1}\nFailed because: {2}"
-            .format(
+            message = "(failed) Failure in {0}\nTest:{1}\nFailed because: {2}".format(
                 self._environment,
                 result.test_name(),
                 result.description())
