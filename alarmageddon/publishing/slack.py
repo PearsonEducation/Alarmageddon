@@ -53,7 +53,7 @@ class SlackPublisher(Publisher):
         return "Slack: {}".format(self.hook_url)
 
     def send(self, result):
-        """sends a result to Slack inf the result is a faliure."""
+        """sends a result to Slack if the result is a faliure."""
         if result.is_failure() and self.will_publish(result):
 
             message = "(failed) Failure in {0}\nTest:{1}\nFailed because: {2}"
@@ -70,7 +70,7 @@ class SlackPublisher(Publisher):
             self._send_to_slack(message_text)
 
     def send_batch(self, results):
-        """Send a batch of results to HipChat.
+        """Send a batch of results to Slack.
 
         Collapses similar failures together to save space.
         """
