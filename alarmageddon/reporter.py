@@ -10,7 +10,7 @@ class ReportingFailure(Exception):
     """
 
     def __init__(self, failures):
-        super(ReportingFailure, self).__init__(
+        Exception.__init__(self,
                 "{} publishing failure(s): ".format(len(failures)) +
                 ",".join((str(failure) for failure in failures)))
 

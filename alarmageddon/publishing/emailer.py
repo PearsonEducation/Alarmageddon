@@ -102,7 +102,7 @@ class SimpleEmailPublisher(Publisher):
                  host=None, port=None, name='EmailPublisher',
                  priority_threshold=None, connect_timeout_seconds=10):
 
-        super(SimpleEmailPublisher, self).__init__(name, priority_threshold)
+        Publisher.__init__(self, name, priority_threshold)
 
         # Set the initial replacement context to the defaults.
         # Overrides will be applied to this dictionary individually.
@@ -277,8 +277,8 @@ class EmailPublisher(SimpleEmailPublisher):
         if defaults is None:
             defaults = {}
 
-        super(EmailPublisher, self).__init__(None, None, name=name,
-                                             priority_threshold=priority_threshold)
+        SimpleEmailPublisher.__init__(self, None, None, name=name,
+                                priority_threshold=priority_threshold)
 
         # Set the initial replacement context to the defaults.
         # Overrides will be applied to this dictionary individually.

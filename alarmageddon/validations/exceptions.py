@@ -20,7 +20,7 @@ class EnrichmentFailure(Exception):
     """
 
     def __init__(self, publisher, validation, values):
-        super(EnrichmentFailure, self).__init__(
+        Exception.__init__(self,
             "Exception while enriching a Validation.")
 
         self._publisher = publisher

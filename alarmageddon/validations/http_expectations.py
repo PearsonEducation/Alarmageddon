@@ -22,7 +22,7 @@ class _ExpectedStatusCodes(ResponseExpectation):
         response's status code to be one of the elements in status_codes.
 
         """
-        super(_ExpectedStatusCodes, self).__init__()
+        ResponseExpectation.__init__(self)
         self.status_codes = status_codes
 
     def validate(self, validation, response):
@@ -50,7 +50,7 @@ class ExpectContainsText(ResponseExpectation):
         text to contain the specified text.
 
         """
-        super(ExpectContainsText, self).__init__()
+        ResponseExpectation.__init__(self)
         self.text = text
 
     def validate(self, validation, response):
@@ -69,7 +69,7 @@ class ExpectedHeader(ResponseExpectation):
     """
     def __init__(self, name, value):
         """Creates an ExpectedHeader object."""
-        super(ExpectedHeader, self).__init__()
+        ResponseExpectation.__init__(self)
         self.name = name
         self.value = value
 

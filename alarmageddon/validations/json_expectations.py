@@ -15,7 +15,7 @@ class ExpectedJsonPredicate(ResponseExpectation):
         payload with a property equal to the specified value.
 
         """
-        super(ExpectedJsonPredicate, self).__init__()
+        ResponseExpectation.__init__(self)
         self.json_property_path = json_property_path
         self.value = value
 

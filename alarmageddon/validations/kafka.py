@@ -35,11 +35,11 @@ class KafkaStatusValidation(SshValidation):
                  kafka_list_topic_command="/opt/kafka/bin/kafka-list-topic.sh",
                  priority=Priority.NORMAL, timeout=None,
                  hosts=None):
-        super(KafkaStatusValidation, self).__init__(ssh_context,
-                                                    "Kafka partition status",
-                                                    priority=priority,
-                                                    timeout=timeout,
-                                                    hosts=hosts)
+        SshValidation.__init__(self, ssh_context,
+                               "Kafka partition status",
+                               priority=priority,
+                               timeout=timeout,
+                               hosts=hosts)
         self.kafka_list_topic_command = kafka_list_topic_command
         self.zookeeper_nodes = zookeeper_nodes
 

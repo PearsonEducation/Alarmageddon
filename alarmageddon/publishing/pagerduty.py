@@ -28,8 +28,7 @@ class PagerDutyPublisher(Publisher):
         if not api_key:
             raise ValueError("api_key parameter is required")
 
-        super(PagerDutyPublisher, self).__init__(
-            "PagerDuty", priority_threshold)
+        Publisher.__init__(self, "PagerDuty", priority_threshold)
 
         self._api_key = api_key
         self._api_end_point = api_end_point

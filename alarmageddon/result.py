@@ -63,7 +63,7 @@ class Failure(TestResult):
     """
 
     def __init__(self, test_name, validation, description, time=None):
-        super(Failure, self).__init__(test_name, validation, description, time)
+        TestResult.__init__(self, test_name, validation, description, time)
 
     def is_failure(self):
         """Returns True."""
@@ -74,7 +74,7 @@ class Success(TestResult):
     """The result of a successful validation."""
 
     def __init__(self, test_name, validation, description=None, time=None):
-        super(Success, self).__init__(test_name, validation, description, time)
+        TestResult.__init__(self, test_name, validation, description, time)
 
     def is_failure(self):
         """Returns False."""

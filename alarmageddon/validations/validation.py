@@ -227,7 +227,7 @@ class GroupValidation(Validation):
                  critical_threshold=float("inf"),
                  order=1, group=None):
 
-        super(GroupValidation, self).__init__(
+        Validation.__init__(self,
             name, priority=Priority.LOW, timeout=None, group=group)
 
         self.low_threshold = low_threshold

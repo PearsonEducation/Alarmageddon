@@ -38,7 +38,7 @@ class GraphiteValidation(Validation):
                  time_range=datetime.timedelta(hours=1),
                  **kwargs):
         """Creates a GraphiteValidation object"""
-        super(GraphiteValidation, self).__init__(name, **kwargs)
+        Validation.__init__(self, name, **kwargs)
         self._context = context
         self.time_range = time_range
         self.metric_name = metric_name

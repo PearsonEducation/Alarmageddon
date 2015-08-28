@@ -10,8 +10,7 @@ class PublishFailure(Exception):
     """
 
     def __init__(self, publisher, result):
-        super(PublishFailure, self).__init__(
-            "Exception while publishing a TestResult.")
+        Exception.__init__(self, "Exception while publishing a TestResult.")
 
         self._publisher = publisher
         self._result = result
@@ -39,8 +38,7 @@ class EnrichmentFailure(Exception):
     """
 
     def __init__(self, publisher, validation, values):
-        super(EnrichmentFailure, self).__init__(
-            "Exception while enriching a Validation.")
+        Exception.__init__(self, "Exception while enriching a Validation.")
 
         self._publisher = publisher
         self._validation = validation

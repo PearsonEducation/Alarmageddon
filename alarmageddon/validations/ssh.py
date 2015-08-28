@@ -54,7 +54,7 @@ class SshValidation(Validation):
                  group=None, connection_retries=0,
                  hosts=None):
         """Creates an SshValidation object"""
-        super(SshValidation, self).__init__(
+        Validation.__init__(self,
             name, priority, timeout, group=group)
         self.context = ssh_context
         if hosts is not None:
@@ -157,7 +157,7 @@ class SshCommandValidation(SshValidation):
     def __init__(self, ssh_context, name, command, working_directory=None,
                  environment=None, priority=Priority.NORMAL, use_sudo=False,
                  timeout=None, connection_retries=0, group=None, hosts=None):
-        super(SshCommandValidation, self).__init__(
+        SshValidation.__init__(self,
             ssh_context,
             name,
             priority=priority,

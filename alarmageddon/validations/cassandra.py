@@ -360,10 +360,10 @@ class CassandraStatusValidation(SshValidation):
                  number_nodes=5, owns_threshold=40,
                  priority=Priority.NORMAL, timeout=None,
                  hosts=None):
-        super(CassandraStatusValidation,self).__init__(ssh_context,
-                                           "Cassandra nodetool status",
-                                           priority=priority,
-                                           timeout=timeout, hosts=hosts)
+        SshValidation.__init__(self, ssh_context,
+                               "Cassandra nodetool status",
+                               priority=priority,
+                               timeout=timeout, hosts=hosts)
         # Service State is different from Service Status but I don't
         # want to break backwards compatibility so we parse the
         # service_state which is really made up of the service state

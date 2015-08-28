@@ -31,7 +31,7 @@ class GraphitePublisher(Publisher):
         if not host:
             raise ValueError("host parameter is required")
 
-        super(GraphitePublisher, self).__init__("Graphite", priority_threshold)
+        Publisher.__init__(self, "Graphite", priority_threshold)
 
         self._prefix = prefix
         self._host = host

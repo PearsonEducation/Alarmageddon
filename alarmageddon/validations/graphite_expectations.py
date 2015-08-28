@@ -75,9 +75,8 @@ class GraphiteExpectation(object):
 class GreaterThanExpectation(GraphiteExpectation):
     """Expect that a graphite metric is greater than a specified number"""
     def __init__(self, validation, lower_bound):
-        super(GreaterThanExpectation, self).__init__(
-              validation,
-              "All values must be greater than {0}".format(lower_bound))
+        GraphiteExpectation.__init__(self, validation,
+                     "All values must be greater than {0}".format(lower_bound))
         self._lower_bound = lower_bound
 
     def validate(self, readings, time_range):
@@ -91,8 +90,7 @@ class GreaterThanExpectation(GraphiteExpectation):
 class LessThanExpectation(GraphiteExpectation):
     """Expect that a graphite metric is less than than a specified number"""
     def __init__(self, validation, upper_bound):
-        super(LessThanExpectation, self).__init__(
-              validation,
+        GraphiteExpectation.__init__(self, validation,
               "All values must be less than {0}".format(upper_bound))
         self._upper_bound = upper_bound
 
@@ -110,8 +108,7 @@ class AverageGreaterThanExpectation(GraphiteExpectation):
 
     """
     def __init__(self, validation, lower_bound):
-        super(AverageGreaterThanExpectation, self).__init__(
-              validation,
+        GraphiteExpectation.__init__(self, validation,
               "Average of all values must be greater than {0}"
               .format(lower_bound))
         self._lower_bound = lower_bound
@@ -130,8 +127,7 @@ class AverageLessThanExpectation(GraphiteExpectation):
 
     """
     def __init__(self, validation, upper_bound):
-        super(AverageLessThanExpectation, self).__init__(
-              validation,
+        GraphiteExpectation.__init__(self, validation,
               "Average of all values must be less than {0}"
               .format(upper_bound))
         self._upper_bound = upper_bound

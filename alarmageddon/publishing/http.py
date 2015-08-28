@@ -57,9 +57,8 @@ class HttpPublisher(Publisher):
                  retry_after_seconds=2, timeout_seconds=5,
                  publish_successes=False, expected_status_code=200,
                  name=None, priority_threshold=None):
-        super(HttpPublisher, self).__init__(
-            name or "HttpPublisher",
-            priority_threshold)
+
+        Publisher.__init__(self, name or "HttpPublisher", priority_threshold)
 
         self._success_url = success_url or url
         if not self._success_url:

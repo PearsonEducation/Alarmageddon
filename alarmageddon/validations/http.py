@@ -33,10 +33,10 @@ class HttpValidation(Validation):
         the provided URL passing the provided headers.
 
         """
-        super(HttpValidation, self).__init__("{0} {1}".format(method, url),
-                                             priority=priority,
-                                             timeout=timeout,
-                                             group=group)
+        Validation.__init__(self, "{0} {1}".format(method, url),
+                            priority=priority,
+                            timeout=timeout,
+                            group=group)
 
         self._url = url
         self._data = data

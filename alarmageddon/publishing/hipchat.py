@@ -52,8 +52,8 @@ class HipChatPublisher(Publisher):
         if not room_name:
             raise ValueError("room_name parameter is required")
 
-        super(HipChatPublisher, self).__init__(
-            "HipChat: {0}".format(room_name), priority_threshold)
+        Publisher.__init__(self, "HipChat: {0}".format(room_name),
+                           priority_threshold)
 
         self._api_token = api_token
         self._api_end_point = api_end_point

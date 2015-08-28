@@ -44,7 +44,7 @@ class SlackPublisher(Publisher):
         if not environment:
             raise ValueError("environment parameter is required")
 
-        super(SlackPublisher, self).__init__("Slack", priority_threshold)
+        Publisher.__init__(self, "Slack", priority_threshold)
 
         self._hook_url = hook_url
         self._environment = environment

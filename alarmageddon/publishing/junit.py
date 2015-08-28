@@ -17,7 +17,7 @@ class JUnitPublisher(Publisher):
         if not filename:
             raise ValueError("filename parameter is required")
 
-        super(JUnitPublisher, self).__init__("JUnit", priority_threshold)
+        Publisher.__init__(self, "JUnit", priority_threshold)
 
         self.filename = filename
 
