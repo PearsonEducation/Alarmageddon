@@ -3,6 +3,7 @@
 An automated service monitoring tool that reports failures to:
 
 * HipChat
+* Slack
 * PagerDuty
 * Graphite
 * Email
