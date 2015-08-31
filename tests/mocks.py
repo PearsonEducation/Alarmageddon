@@ -22,12 +22,12 @@ class MockPublisher:
 
 class MockReporter(alarmageddon.reporter.Reporter):
     def __init__(self):
-        super(MockReporter, self).__init__([])
+        alarmageddon.reporter.Reporter.__init__(self, [])
         self.failures = 0
         self.successes = 0
 
     def collect(self, item, call):
-        super(MockReporter, self).collect(item, call)
+        alarmageddon.reporter.Reporter.collect(self, item, call)
         if call.excinfo:
             self.failures += 1
         else:

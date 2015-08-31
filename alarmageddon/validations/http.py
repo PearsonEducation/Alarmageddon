@@ -166,7 +166,7 @@ class HttpValidation(Validation):
 
     def fail(self, reason):
         """Causes this HttpValidation to fail with the given reason."""
-        super(HttpValidation, self).fail(reason)
+        Validation.fail(self, reason)
 
     def duplicate_with_hosts(self, host_names, port=None):
         """Returns a list of new HttpValidation that are identical to this

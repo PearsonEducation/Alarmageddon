@@ -57,7 +57,7 @@ class GraphiteValidation(Validation):
 
     def fail(self, reason):
         """Causes this GraphiteValidation to fail with the given reason."""
-        super(GraphiteValidation, self).fail(reason)
+        Validation.fail(self, reason)
 
     def expect_average_in_range(self, lower_bound, upper_bound):
         """The average reading of the specified time range should fall between
