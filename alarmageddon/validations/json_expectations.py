@@ -63,7 +63,7 @@ class ExpectedJsonValueLessThan(ExpectedJsonPredicate):
         ExpectedJsonPredicate.__init__(self, json_property_path, value)
 
     def validate_value(self, validation, expected_value, actual_value):
-        if not actual_value:
+        if actual_value is None:
             validation.fail(
                 "missing JSON property {0}".format(self.json_property_path))
         elif float(actual_value) >= float(expected_value):
@@ -83,7 +83,7 @@ class ExpectedJsonValueGreaterThan(ExpectedJsonPredicate):
         ExpectedJsonPredicate.__init__(self, json_property_path, value)
 
     def validate_value(self, validation, expected_value, actual_value):
-        if not actual_value:
+        if actual_value is None:
             validation.fail(
                 "missing JSON property {0}".format(self.json_property_path))
         elif float(actual_value) <= float(expected_value):

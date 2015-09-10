@@ -264,3 +264,16 @@ def test_duplicate_with_hosts():
     assert "firstname" in names[0]
     assert "secondname" in names[1]
     assert len(names) == 2
+
+# Test submitted by Curtis Allen (https://github.com/curtisallen).
+# Thanks Curtis!
+#
+# Bug: We found the value of the failed property which was zero and
+# tested it using 'if not actual_value' which evaluated to False.
+def test_get_json_value_less_than_zero(httpserver):
+    httpserver.serve_content(code=200,
+                             headers={"content-type": "application/json"},
+                             content='{"mode": "NORMAL","failed":0}')
+    (HttpValidation.get(httpserver.url)
+     .expect_json_property_value_less_than('failed', 2)
+     .perform({}))
