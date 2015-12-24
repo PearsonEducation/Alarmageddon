@@ -40,7 +40,16 @@ An example of expectations on HttpValidations, where we expect to get either a 2
 
     validation = HttpValidation.get("url")
     validation.expect_status_codes([200,404])
-    validation.expect_json_property("json.path.to.value","expected")
+    validation.expect_json_property_value("json.path.to.value","expected")
+
+``expect_json_property_value`` accepts query string that allows you to pluck values from json. Consider the following json document
+
+    {"abc": "123", "another": {"nested": "entry"}, "alpha": {"array": [1, 2, 3, 4]}}
+
+``abc`` will reference ``"123"``
+``another.nested`` will reference ``"entry"``
+``array[4]`` will reference ``4``
+``array[*]`` will reference ``[1, 2, 3, 4]`` 
 
 SSH
 -------------

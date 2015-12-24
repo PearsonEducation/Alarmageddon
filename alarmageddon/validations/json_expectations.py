@@ -48,10 +48,20 @@ class ExpectedJsonEquality(ExpectedJsonPredicate):
         ExpectedJsonPredicate.__init__(self, json_property_path, value)
 
     def validate_value(self, validation, expected_value, actual_value):
-        if not actual_value or actual_value != expected_value:
-            validation.fail(
-                "expected JSON property {0} to be '{1}', actual value: '{2}'"
-                .format(self.json_property_path, expected_value, actual_value))
+        if type(actual_value) is list:
+            if expected_value not in actual_value:
+                validation.fail(
+                    ("expected JSON property {0}"
+                     " to contain '{1}', actual value: '{2}'")
+                    .format(
+                        self.json_property_path, expected_value, actual_value))
+        else:
+            if not actual_value or actual_value != expected_value:
+                validation.fail(
+                    ("expected JSON property {0}"
+                     " to be '{1}', actual value: '{2}'")
+                    .format(
+                        self.json_property_path, expected_value, actual_value))
 
     def __repr__(self):
         return "{}: {} should be {}".format(type(self).__name__, self.json_property_path, self.value)
@@ -63,7 +73,10 @@ class ExpectedJsonValueLessThan(ExpectedJsonPredicate):
         ExpectedJsonPredicate.__init__(self, json_property_path, value)
 
     def validate_value(self, validation, expected_value, actual_value):
-        if actual_value is None:
+        if type(actual_value) is list:
+            validation.fail(
+                "cannot use array wildcard with less than assertion")
+        elif actual_value is None:
             validation.fail(
                 "missing JSON property {0}".format(self.json_property_path))
         elif float(actual_value) >= float(expected_value):
@@ -83,7 +96,10 @@ class ExpectedJsonValueGreaterThan(ExpectedJsonPredicate):
         ExpectedJsonPredicate.__init__(self, json_property_path, value)
 
     def validate_value(self, validation, expected_value, actual_value):
-        if actual_value is None:
+        if type(actual_value) is list:
+            validation.fail(
+                "cannot use array wildcard with less than assertion")
+        elif actual_value is None:
             validation.fail(
                 "missing JSON property {0}".format(self.json_property_path))
         elif float(actual_value) <= float(expected_value):
@@ -97,7 +113,7 @@ class ExpectedJsonValueGreaterThan(ExpectedJsonPredicate):
         return "{}: {} > {}".format(type(self).__name__, self.json_property_path, self.value)
 
 
-INDEXED_ARRAY = re.compile(r"([^[]+)\[(\d+)\]")
+INDEXED_ARRAY = re.compile(r"([^[]+)\[(\d+|\*)\]")
 
 
 class _JsonQuery(object):
@@ -128,8 +144,13 @@ class _JsonQuery(object):
                     # We have an array property and the caller has specified
                     # which element of the array to validate against
                     name = match.group(1)
-                    index = int(match.group(2))
-                    root = root[name][index]
+                    if match.group(2) == "*":
+                        # caller has supplied a wildcard
+                        # return the list element
+                        root = root[name]
+                    else:
+                        index = int(match.group(2))
+                        root = root[name][index]
                 else:
                     root = root[path_elem]
         except Exception:

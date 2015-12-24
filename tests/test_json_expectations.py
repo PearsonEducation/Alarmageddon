@@ -21,6 +21,12 @@ def test_json_equality():
     exp.validate_value(validation, 5, 5)
 
 
+def test_json_wildcard_equality():
+    validation = HttpValidation.get("url")
+    exp = ExpectedJsonEquality("path[*]", [1, 2, 3])
+    exp.validate_value(validation, 2, [1, 2, 3])
+
+
 def test_json_equality_fails():
     validation = HttpValidation.get("url")
     exp = ExpectedJsonEquality("path", 5)
@@ -34,6 +40,13 @@ def test_json_less_than():
     exp.validate_value(validation, 5, 3)
 
 
+def test_json_less_than_wildcard():
+    validation = HttpValidation.get("url")
+    exp = ExpectedJsonValueLessThan("path[*]", [1, 2, 3])
+    with pytest.raises(ValidationFailure):
+        exp.validate_value(validation, 1, [1, 2, 3])
+
+
 def test_json_less_than_fails():
     validation = HttpValidation.get("url")
     exp = ExpectedJsonValueLessThan("path", 5)
@@ -45,6 +58,13 @@ def test_json_greater_than():
     validation = HttpValidation.get("url")
     exp = ExpectedJsonValueGreaterThan("path", 5)
     exp.validate_value(validation, 5, 7)
+
+
+def test_json_greater_than_wildcard():
+    validation = HttpValidation.get("url")
+    exp = ExpectedJsonValueGreaterThan("path[*]", [1, 2, 3])
+    with pytest.raises(ValidationFailure):
+        exp.validate_value(validation, 1, [1, 2, 3])
 
 
 def test_json_greater_than_fails():
@@ -71,6 +91,13 @@ def test_json_query_array():
             "alpha": {"array": [1, 2, 3, 4]}}
     result = _JsonQuery.find(json, "alpha.array[2]")
     assert result == 3
+
+
+def test_json_wildcard_query_array():
+    json = {"abc": "123", "another": {"nested": "entry"},
+            "alpha": {"array": [1, 2, 3, 4]}}
+    result = _JsonQuery.find(json, "alpha.array[*]")
+    assert result == [1, 2, 3, 4]
 
 
 def test_validate():
