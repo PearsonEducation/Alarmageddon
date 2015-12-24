@@ -73,7 +73,10 @@ class ExpectedJsonValueLessThan(ExpectedJsonPredicate):
         ExpectedJsonPredicate.__init__(self, json_property_path, value)
 
     def validate_value(self, validation, expected_value, actual_value):
-        if actual_value is None:
+        if type(actual_value) is list:
+            validation.fail(
+                "cannot use array wildcard with less than assertion")
+        elif actual_value is None:
             validation.fail(
                 "missing JSON property {0}".format(self.json_property_path))
         elif float(actual_value) >= float(expected_value):
@@ -93,7 +96,10 @@ class ExpectedJsonValueGreaterThan(ExpectedJsonPredicate):
         ExpectedJsonPredicate.__init__(self, json_property_path, value)
 
     def validate_value(self, validation, expected_value, actual_value):
-        if actual_value is None:
+        if type(actual_value) is list:
+            validation.fail(
+                "cannot use array wildcard with less than assertion")
+        elif actual_value is None:
             validation.fail(
                 "missing JSON property {0}".format(self.json_property_path))
         elif float(actual_value) <= float(expected_value):

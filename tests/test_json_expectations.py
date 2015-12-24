@@ -40,6 +40,13 @@ def test_json_less_than():
     exp.validate_value(validation, 5, 3)
 
 
+def test_json_less_than_wildcard():
+    validation = HttpValidation.get("url")
+    exp = ExpectedJsonValueLessThan("path[*]", [1, 2, 3])
+    with pytest.raises(ValidationFailure):
+        exp.validate_value(validation, 1, [1, 2, 3])
+
+
 def test_json_less_than_fails():
     validation = HttpValidation.get("url")
     exp = ExpectedJsonValueLessThan("path", 5)
@@ -51,6 +58,13 @@ def test_json_greater_than():
     validation = HttpValidation.get("url")
     exp = ExpectedJsonValueGreaterThan("path", 5)
     exp.validate_value(validation, 5, 7)
+
+
+def test_json_greater_than_wildcard():
+    validation = HttpValidation.get("url")
+    exp = ExpectedJsonValueGreaterThan("path[*]", [1, 2, 3])
+    with pytest.raises(ValidationFailure):
+        exp.validate_value(validation, 1, [1, 2, 3])
 
 
 def test_json_greater_than_fails():
