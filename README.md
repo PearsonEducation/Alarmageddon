@@ -104,6 +104,14 @@ Sends emails on test failure. The SimpleEmailPublisher will email the text of th
 
 Changelog
 =========
+
+1.0.3
+* Added a forced timeout that will terminate a validation if it runs for too long.
+* PagerDuty incident IDs are now tied to the contents of the validation.
+* Better error messages when publishing fails.
+* Slack publisher (thanks Curtis Allen!)
+* Wildcards in JSON expectations (thanks Curtis Allen!)
+
 1.0.2
 * Update Cassandra validation to better handle different Cassandra versions.
 * Fix string formatting on SSH, Cassandra, and RabbitMQ validation failures.
