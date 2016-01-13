@@ -1,5 +1,6 @@
 from pytest_localserver.http import WSGIServer
 from alarmageddon.publishing.pagerduty import PagerDutyPublisher
+import alarmageddon.publishing.pagerduty as pagerduty
 from alarmageddon.result import Failure
 from alarmageddon.result import Success
 from alarmageddon.publishing.exceptions import PublishFailure
@@ -90,6 +91,16 @@ def test_publish_failure(httpserver):
     failure = Failure("bar", v, "message")
     with pytest.raises(PublishFailure):
         pub.send(failure)
+
+
+def test_message_length_capped(httpserver):
+    httpserver.serve_content(code=300, headers={"content-type": "text/plain"},
+                             content='{"mode":"NORMAL"}')
+    pub = PagerDutyPublisher(httpserver.url, "token")
+    v = Validation("low", priority=Priority.CRITICAL)
+    failure = Failure("bar", v, "-"*2000)
+    message = pub._construct_message(failure)
+    assert len(message) == pagerduty.MAX_LEN
 
 
 def test_publish_retries(ratelimited):

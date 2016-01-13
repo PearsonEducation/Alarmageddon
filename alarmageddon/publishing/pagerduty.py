@@ -7,6 +7,9 @@ import requests
 import json
 import time
 import hashlib
+import warnings
+
+MAX_LEN = 1024
 
 
 class PagerDutyPublisher(Publisher):
@@ -58,11 +61,18 @@ class PagerDutyPublisher(Publisher):
         #this is still not optimal - validations may mutate between creation
         #and here
         message = str(type(validation)) + str(validation.__dict__)
-        print message
         hasher = hashlib.md5()
         hasher.update(message)
         pagerduty_id = hasher.hexdigest()
         return pagerduty_id
+
+    def _construct_message(self, result):
+        message = "Failure: {0} - {1}".format(result.test_name(),
+                                              result.description())
+        if len(message) > MAX_LEN:
+            warnings.warn("PagerDuty message had length {0}, truncating to {1}".format(len(message),MAX_LEN), RuntimeWarning)
+            message = message[:MAX_LEN]
+        return message
 
     def send(self, result):
         """Creates an incident in pager duty.
@@ -72,9 +82,7 @@ class PagerDutyPublisher(Publisher):
 
         """
         if result.is_failure() and self.will_publish(result):
-            message = "Failure: {0} - {1}".format(result.test_name(),
-                                                  result.description())
-
+            message = self._construct_message(result)
             headers = {
                 "Content-Type": "application/json"
             }
