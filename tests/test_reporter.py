@@ -6,7 +6,7 @@ from alarmageddon.publishing.exceptions import PublishFailure
 
 class FailingPublisher:
     def send_batch(self, results):
-        raise PublishFailure("publisher","result")
+        raise PublishFailure("publisher","NOT_HIDDEN")
 
 
 def test_repr(env):
@@ -69,3 +69,13 @@ def test_reporter_runs_all_publishers_before_raising(env, valid):
         if i != bad_pub:
             assert pub.successes == 1
             assert pub.failures == 0
+
+def test_reporter_shows_publish_error_info(env):
+    reporter = env["reporter"]
+    publishers = [FailingPublisher()]
+    reporter.publishers = publishers
+    reporter.collect(Success("success", Validation("valid")))
+    try:
+        reporter.report()
+    except ReportingFailure,e:
+        assert "NOT_HIDDEN" in str(e) 
