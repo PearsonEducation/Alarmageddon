@@ -98,6 +98,6 @@ class PagerDutyPublisher(Publisher):
                     #in a wait and then a retry.
                     time.sleep(2**i)
                 else:
-                    raise PublishFailure(self, "{0} - {1}".format(result, resp.text))
+                    raise PublishFailure(self, "{0} - {1} ({2})".format(result, resp.text, resp.status_code))
             else:
-                raise PublishFailure(self, "{0} - {1}".format(result, resp.text))
+                raise PublishFailure(self, "{0} - {1} ({2})".format(result, resp.text, resp.status_code))
