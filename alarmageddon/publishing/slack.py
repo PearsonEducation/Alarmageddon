@@ -8,7 +8,7 @@ import collections
 from alarmageddon.publishing.publisher import Publisher
 from alarmageddon.publishing.exceptions import PublishFailure
 
-fallback_text = "There were Alarmageddon failures"
+FALLBACK_TEXT = "There were Alarmageddon failures"
 
 
 def _get_collapsed_message(results):
@@ -35,7 +35,7 @@ class SlackPublisher(Publisher):
     :param hook_url: The Slack Hook URL
     :param priority_threshold: Will publish validations of this priority or
       higher.
-
+    :param environment: The environment that tests are being run in.
     """
 
     def __init__(self, hook_url, environment, priority_threshold=None):
@@ -44,10 +44,11 @@ class SlackPublisher(Publisher):
         if not environment:
             raise ValueError("environment parameter is required")
 
-        Publisher.__init__(self, "Slack", priority_threshold)
+        Publisher.__init__(self, "Slack",
+                           priority_threshold=priority_threshold,
+                           environment=environment)
 
         self._hook_url = hook_url
-        self._environment = environment
 
     def __str__(self):
         return "Slack: {}".format(self.hook_url)
@@ -57,12 +58,12 @@ class SlackPublisher(Publisher):
         if result.is_failure() and self.will_publish(result):
 
             message = "(failed) Failure in {0}\nTest:{1}\nFailed because: {2}".format(
-                self._environment,
+                self.environment,
                 result.test_name(),
                 result.description())
 
             message_text = self._build_message(
-                fallback_text,
+                FALLBACK_TEXT,
                 self._get_jenkins_job_url(),
                 message)
 
@@ -81,18 +82,18 @@ class SlackPublisher(Publisher):
                 errors += 1
         if errors == 0:
             return
-        message = "{0} failure(s) in {1}:\n".format(errors, self._environment)
+        message = "{0} failure(s) in {1}:\n".format(errors, self.environment)
         message += "\n".join(_get_collapsed_message(collapsed_result)
                              for collapsed_result in collapsed.itervalues())
 
         message_text = self._build_message(
-            fallback_text,
+            FALLBACK_TEXT,
             self._get_jenkins_job_url(),
             message)
 
         self._send_to_slack(message_text)
 
-    def _build_message(self, fallback_text, run_link, text):
+    def _build_message(self, FALLBACK_TEXT, run_link, text):
         pretext = "Alarmageddon run completed."
         if run_link is not None:
             pretext = "{} <{}|View Result>".format(pretext, run_link)
@@ -100,7 +101,7 @@ class SlackPublisher(Publisher):
         payload = {
             "attachments": [
                 {
-                    "fallback": fallback_text,
+                    "fallback": FALLBACK_TEXT,
                     "author_name": "Alarmageddon",
                     "color": "danger",
                     "pretext": pretext,

@@ -50,15 +50,17 @@ class HttpPublisher(Publisher):
     :param name: The name of this publisher.
     :param priority_threshold: Will publish validations of this priority or
       higher.
-
+    :param environment: The environment that tests are being run in.
     """
     def __init__(self, url=None, success_url=None, failure_url=None,
                  method="POST", headers=None, auth=None, attempts=1,
                  retry_after_seconds=2, timeout_seconds=5,
                  publish_successes=False, expected_status_code=200,
-                 name=None, priority_threshold=None):
+                 name=None, priority_threshold=None, environment=None):
 
-        Publisher.__init__(self, name or "HttpPublisher", priority_threshold)
+        Publisher.__init__(self, name or "HttpPublisher",
+                           priority_threshold=priority_threshold,
+                           environment=environment)
 
         self._success_url = success_url or url
         if not self._success_url:

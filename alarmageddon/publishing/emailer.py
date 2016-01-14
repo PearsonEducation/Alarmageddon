@@ -95,14 +95,17 @@ class SimpleEmailPublisher(Publisher):
       higher if they are appropriately enriched.
     :param connect_timeout_seconds: How long to attempt to connect to the SMTP
       server.
-
+    :param environment: The environment that tests are being run in.
     """
 
     def __init__(self, sender_address, recipient_addresses,
                  host=None, port=None, name='EmailPublisher',
-                 priority_threshold=None, connect_timeout_seconds=10):
+                 priority_threshold=None, connect_timeout_seconds=10,
+                 environment=None):
 
-        Publisher.__init__(self, name, priority_threshold)
+        Publisher.__init__(self, name,
+                           priority_threshold=priority_threshold,
+                           environment=environment)
 
         # Set the initial replacement context to the defaults.
         # Overrides will be applied to this dictionary individually.
@@ -239,6 +242,7 @@ class EmailPublisher(SimpleEmailPublisher):
       higher if they are appropriately enriched.
     :param connect_timeout_seconds: How long to attempt to connect to the SMTP
       server.
+    :param environment: The environment that tests are being run in.
 
     config is an Alarmageddon config object that contains at least the
     following:
@@ -269,7 +273,8 @@ class EmailPublisher(SimpleEmailPublisher):
 
     def __init__(self, config, email_notifications_config_key=None,
                  name='EmailPublisher', defaults=None,
-                 priority_threshold=None, connect_timeout_seconds=10):
+                 priority_threshold=None, connect_timeout_seconds=10,
+                 environment=None):
 
         if not config:
             raise ValueError("config parameter is required.")
@@ -278,7 +283,8 @@ class EmailPublisher(SimpleEmailPublisher):
             defaults = {}
 
         SimpleEmailPublisher.__init__(self, None, None, name=name,
-                                priority_threshold=priority_threshold)
+                                priority_threshold=priority_threshold,
+                                environment=environment)
 
         # Set the initial replacement context to the defaults.
         # Overrides will be applied to this dictionary individually.

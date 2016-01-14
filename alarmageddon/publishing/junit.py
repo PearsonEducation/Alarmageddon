@@ -10,14 +10,17 @@ class JUnitPublisher(Publisher):
     :param filename: The file to write the XML to.
     :param priority_threshold: Will publish validations of this priority or
       higher.
-
+    :param environment: The environment that tests are being run in.
     """
 
-    def __init__(self, filename, priority_threshold=None):
+    def __init__(self, filename, priority_threshold=None,
+                 environment=None):
         if not filename:
             raise ValueError("filename parameter is required")
 
-        Publisher.__init__(self, "JUnit", priority_threshold)
+        Publisher.__init__(self, "JUnit",
+                           priority_threshold=priority_threshold,
+                           environment=environment)
 
         self.filename = filename
 
