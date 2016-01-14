@@ -24,5 +24,3 @@ fi
 # install Alarmageddon and most of its dependencies
 ${install_location}/.venv/bin/python setup.py install
 
-# install additional dependencies (can these all be moved to setup.py?) 
-${install_location}/.venv/bin/pip install -r requirements.txt
