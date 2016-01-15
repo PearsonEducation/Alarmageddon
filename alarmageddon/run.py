@@ -214,7 +214,7 @@ def construct_publishers(config):
     :param config: Config object to construct the publishers from.
 
     """
-    enironment = config.enironment_name()
+    environment = config.environment_name()
     publishers = []
 
     try:
