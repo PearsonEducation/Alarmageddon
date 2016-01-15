@@ -215,34 +215,36 @@ def construct_publishers(config):
 
     """
     environment = config.environment_name()
+    env_config = config.environment_config
     publishers = []
 
     try:
         publishers.append(
             hipchat.HipChatPublisher(
-                api_end_point = config["hipchat_host"],
-                api_token = config["hipchat_token"],
-                environment = environment_name,
-                room_name = config["hipchat_room"],
+                api_end_point = env_config["hipchat_host"],
+                api_token = env_config["hipchat_token"],
+                environment = environment,
+                room_name = env_config["hipchat_room"],
                 priority_threshold = Priority.NORMAL))
     except KeyError:
         pass
 
     try:
         publishers.append(pagerduty.PagerDutyPublisher(
-            api_end_point = config["pagerduty_host"],
-            api_key = config["pagerduty_token"],
-            environment = environment_name,
+            api_end_point = env_config["pagerduty_host"],
+            api_key = env_config["pagerduty_token"],
+            environment = environment,
             priority_threshold = Priority.CRITICAL))
     except KeyError:
         pass
 
     try:
         publishers.append(graphite.GraphitePublisher(
-            host = config["graphite_host"],
-            port = config.get("graphite_port"),
-            environment = environment_name,
+            host = env_config["graphite_host"],
+            port = env_config["graphite_port"],
+            environment = environment,
             priority_threshold = Priority.LOW))
     except KeyError:
         pass
+
     return publishers
