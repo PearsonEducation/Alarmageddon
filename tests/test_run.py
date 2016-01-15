@@ -1,11 +1,7 @@
 from alarmageddon.validations.http import HttpValidation
 from alarmageddon.validations.validation import\
     Validation, Priority, GroupValidation
-from alarmageddon.config import Config
 from alarmageddon.publishing.publisher import Publisher
-from alarmageddon.publishing.hipchat import HipChatPublisher
-from alarmageddon.publishing.graphite import GraphitePublisher
-from alarmageddon.publishing.pagerduty import PagerDutyPublisher
 import alarmageddon.run as run
 import pytest
 import time
@@ -176,7 +172,6 @@ def test_run_validations_sets_time_with_function_if_available(env, processes):
     run._run_validations([validation], reporter, processes)
     assert reporter._reports[0].time == 5
 
-
 def test_run_validations_enforces_global_timeout(env, processes):
     timeout = 5
     reporter = env["reporter"]
@@ -187,7 +182,6 @@ def test_run_validations_enforces_global_timeout(env, processes):
     assert reporter._reports[0].is_failure()
     assert reporter._reports[0].time == timeout
 
-
 def test_run_validations_without_timeout_hangs(env, processes):
     #this test just verifies NeverFail behaves as we expect
     timeout = 60
@@ -197,100 +191,3 @@ def test_run_validations_without_timeout_hangs(env, processes):
     validation = NeverFinish("shouldn't finish but will")
     run._run_validations([validation], reporter, processes, timeout)
     assert not reporter._reports[0].is_failure()
-
-@pytest.fixture
-def config():
-    return Config(
-        {
-            "environment": {
-                "stg": {
-                    "hipchat_room"  : "hipchat_room",
-                    "hipchat_host"  : "hipchat_host",
-                    "hipchat_token" : "hipchat_token",
-
-                    "pagerduty_host"  : "pagerduty_host",
-                    "pagerduty_token" : "pagerduty_token",
-
-                    "graphite_host" : "www.example.com",
-                    "graphite_port" : "10",
-                }
-            }
-        }, "stg")
-
-
-def test_construct_publishers(config):
-    publishers = run.construct_publishers(config)
-
-    assert(len(publishers) == 3)
-    assert(type(publishers[0]) is HipChatPublisher)
-    assert(type(publishers[1]) is PagerDutyPublisher)
-    assert(type(publishers[2]) is GraphitePublisher)
-
-
-def test_construct_publishers_recovers_from_missing_hipchat_host(config):
-    del config['environment']['stg']['hipchat_host']
-
-    publishers = run.construct_publishers(config)
-
-    assert(len(publishers) == 2)
-    assert(type(publishers[0]) is PagerDutyPublisher)
-    assert(type(publishers[1]) is GraphitePublisher)
-
-def test_construct_publishers_recovers_from_missing_hipchat_host(config):
-    del config['environment']['stg']['hipchat_token']
-
-    publishers = run.construct_publishers(config)
-
-    assert(len(publishers) == 2)
-    assert(type(publishers[0]) is PagerDutyPublisher)
-    assert(type(publishers[1]) is GraphitePublisher)
-
-
-def test_construct_publishers_recovers_from_missing_hipchat_host(config):
-    del config['environment']['stg']['hipchat_room']
-
-    publishers = run.construct_publishers(config)
-
-    assert(len(publishers) == 2)
-    assert(type(publishers[0]) is PagerDutyPublisher)
-    assert(type(publishers[1]) is GraphitePublisher)
-
-
-def test_construct_publishers_recovers_from_missing_pagerduty_host(config):
-    del config['environment']['stg']['pagerduty_host']
-
-    publishers = run.construct_publishers(config)
-
-    assert(len(publishers) == 2)
-    assert(type(publishers[0]) is HipChatPublisher)
-    assert(type(publishers[1]) is GraphitePublisher)
-
-
-def test_construct_publishers_recovers_from_missing_pagerduty_token(config):
-    del config['environment']['stg']['pagerduty_token']
-
-    publishers = run.construct_publishers(config)
-
-    assert(len(publishers) == 2)
-    assert(type(publishers[0]) is HipChatPublisher)
-    assert(type(publishers[1]) is GraphitePublisher)
-
-
-def test_construct_publishers_recovers_from_missing_graphite_host(config):
-    del config['environment']['stg']['graphite_host']
-
-    publishers = run.construct_publishers(config)
-
-    assert(len(publishers) == 2)
-    assert(type(publishers[0]) is HipChatPublisher)
-    assert(type(publishers[1]) is PagerDutyPublisher)
-
-
-def test_construct_publishers_recovers_from_missing_graphite_port(config):
-    del config['environment']['stg']['graphite_port']
-
-    publishers = run.construct_publishers(config)
-
-    assert(len(publishers) == 2)
-    assert(type(publishers[0]) is HipChatPublisher)
-    assert(type(publishers[1]) is PagerDutyPublisher)
