@@ -11,7 +11,7 @@ The following example GETs www.google.com, and reports to HipChat if the return 
 
     import alarmageddon
     from alarmageddon.validations.http import HttpValidation
-    from alarmageddon.publishers.hipchat import HipChatPublisher
+    from alarmageddon.publishing.hipchat import HipChatPublisher
 
     validations = [HttpValidation.get("http://www.google.com").expect_status_codes([200])]
 
