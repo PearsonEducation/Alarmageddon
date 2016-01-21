@@ -5,6 +5,7 @@ from alarmageddon.validations.exceptions import ValidationFailure
 import pytest
 import time
 import requests
+import json
 
 
 def slow_app(environ, start_response):
@@ -277,3 +278,51 @@ def test_get_json_value_less_than_zero(httpserver):
     (HttpValidation.get(httpserver.url)
      .expect_json_property_value_less_than('failed', 2)
      .perform({}))
+
+
+def test_nested_json_value(httpserver):
+    httpserver.serve_content(
+        code=200,
+        headers={"content-type": "application/json"},
+        content=json.dumps({
+            "took" : 270,
+            "timed_out" : False,
+            "_shards" : {
+                "total" : 576,
+                "successful" : 576,
+                "failed" : 0
+                },
+                "hits" : {
+                    "total" : 0,
+                    "max_score" : 0.0,
+                    "hits" : [ ]
+                    }
+            })
+        )
+    (HttpValidation.get(httpserver.url)
+     .expect_json_property_value('hits.total', 0)
+     .perform({}))
+
+def test_nested_json_value_wrong_type(httpserver):
+    httpserver.serve_content(
+        code=200,
+        headers={"content-type": "application/json"},
+        content=json.dumps({
+            "took" : 270,
+            "timed_out" : False,
+            "_shards" : {
+                "total" : 576,
+                "successful" : 576,
+                "failed" : 0
+                },
+                "hits" : {
+                    "total" : 0,
+                    "max_score" : 0.0,
+                    "hits" : [ ]
+                    }
+            })
+        )
+    with pytest.raises(ValidationFailure):
+        (HttpValidation.get(httpserver.url)
+        .expect_json_property_value('hits.total', '0')
+        .perform({}))

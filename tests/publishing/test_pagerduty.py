@@ -179,3 +179,17 @@ def test_generate_id_consistency_ssh(tmpdir):
 
     assert pub._generate_id(failure) == pub._generate_id(another)
 
+
+def test_environment_name_is_present(httpserver):
+    environment = 'xanadu'
+
+    pub = PagerDutyPublisher(httpserver.url, "token",
+                             environment=environment)
+
+    message = pub._construct_message(
+        Failure("ternary computers not supported!",
+                Validation("bit frobnication validation",
+                           priority=Priority.CRITICAL),
+                "unable to frobnicate bits!"))
+
+    assert message.startswith("Failure in %s:" % environment)

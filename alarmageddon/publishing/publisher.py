@@ -9,12 +9,14 @@ class Publisher(object):
     :param name: The name of this publisher.
     :param priority_threshold: Will publish validations of this priority or
       higher.
-
+    :param environment: The environment that tests are being run in.
     """
 
-    def __init__(self, name=None, priority_threshold=None):
+    def __init__(self, name=None, priority_threshold=None,
+                 environment=None):
         self._name = name
         self.priority_threshold = priority_threshold
+        self.environment = environment
 
     def name(self):
         """Return the name of the publisher."""

@@ -23,15 +23,19 @@ class PagerDutyPublisher(Publisher):
     :param api_token: A PagerDuty API token.
     :param priority_threshold: Will publish validations of this priority or
       higher.
+    :param environment: The environment that tests are being run in.
      """
 
-    def __init__(self, api_end_point, api_key, priority_threshold=None):
+    def __init__(self, api_end_point, api_key, priority_threshold=None,
+                 environment=None):
         if not api_end_point:
             raise ValueError("api_end_point parameter is required")
         if not api_key:
             raise ValueError("api_key parameter is required")
 
-        Publisher.__init__(self, "PagerDuty", priority_threshold)
+        Publisher.__init__(self, "PagerDuty",
+                           priority_threshold=priority_threshold,
+                           environment=environment or 'unknown')
 
         self._api_key = api_key
         self._api_end_point = api_end_point
@@ -67,8 +71,10 @@ class PagerDutyPublisher(Publisher):
         return pagerduty_id
 
     def _construct_message(self, result):
-        message = "Failure: {0} - {1}".format(result.test_name(),
-                                              result.description())
+        message = "Failure in {0}: {1} - {2}".format(
+            self.environment,
+            result.test_name(),
+            result.description())
         if len(message) > MAX_LEN:
             warnings.warn("PagerDuty message had length {0}, truncating to {1}".format(len(message),MAX_LEN), RuntimeWarning)
             message = message[:MAX_LEN]

@@ -53,22 +53,22 @@ class HipChatPublisher(Publisher):
             raise ValueError("room_name parameter is required")
 
         Publisher.__init__(self, "HipChat: {0}".format(room_name),
-                           priority_threshold)
+                           priority_threshold=priority_threshold,
+                           environment=environment)
 
         self._api_token = api_token
         self._api_end_point = api_end_point
         self._room_name = room_name
-        self._environment = environment
 
     def __str__(self):
         return "Hipchat: {}, room {}, env {}".format(
-                self._api_end_point, self._room_name, self._environment
+                self._api_end_point, self._room_name, self.environment
                 )
 
     def __repr__(self):
         return "Hipchat: {} ({}), room {}, env {}".format(
                 self._api_end_point, self._api_token,
-                self._room_name, self._environment
+                self._room_name, self.environment
                 )
 
     def send_batch(self, results):
@@ -85,7 +85,7 @@ class HipChatPublisher(Publisher):
                 errors += 1
         if errors == 0:
             return
-        message = "{0} failure(s) in {1}:\n".format(errors, self._environment)
+        message = "{0} failure(s) in {1}:\n".format(errors, self.environment)
         message += "\n".join(_get_collapsed_message(collapsed_result)
                              for collapsed_result in collapsed.itervalues())
         self._send_to_hipchat(message)
@@ -124,7 +124,7 @@ class HipChatPublisher(Publisher):
 
             message = ("<b>(failed) Failure in {0}</b><br/><b>Test:</b> " +
                        "{1}<br/><b>Failed because:" +
-                       "</b> {2}").format(self._environment,
+                       "</b> {2}").format(self.environment,
                                           result.test_name(),
                                           result.description())
             self._send_to_hipchat(message)

@@ -20,6 +20,7 @@ class GraphitePublisher(Publisher):
       write to.
     :param priority_threshold: Will publish validations of this priority or
       higher.
+    :param environment: The environment that tests are being run in.
 
     """
 
@@ -27,11 +28,14 @@ class GraphitePublisher(Publisher):
                  failed_tests_counter='failed',
                  passed_tests_counter='passed',
                  prefix='alarmageddon',
-                 priority_threshold=None):
+                 priority_threshold=None,
+                 environment=None):
         if not host:
             raise ValueError("host parameter is required")
 
-        Publisher.__init__(self, "Graphite", priority_threshold)
+        Publisher.__init__(self, "Graphite",
+                           priority_threshold=priority_threshold,
+                           environment=environment)
 
         self._prefix = prefix
         self._host = host

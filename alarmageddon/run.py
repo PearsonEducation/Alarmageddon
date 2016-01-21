@@ -41,7 +41,7 @@ def run_tests(validations, publishers=None, config_path=None,
     :param dry_run: When True, will prevent Alarmageddon from performing
       validations or publishing results, and instead will print which
       validations will be published by which publishers upon failure.
-    :param processes: The number of worker processes to spawn. 
+    :param processes: The number of worker processes to spawn.
     :param print_banner: When True, print the Alarmageddon banner.
     :timeout: If a validation runs for longer than this number of seconds,
       Alarmageddon will kill the process running it.
@@ -54,16 +54,16 @@ def run_tests(validations, publishers=None, config_path=None,
     """
 
     if config is not None:
-        warnings.warn("config keyword argument in run_tests is deprecated" + 
+        warnings.warn("config keyword argument in run_tests is deprecated" +
                       " and has no effect.", DeprecationWarning)
     if config_path is not None:
-        warnings.warn("config_path keyword argument in run_tests is" + 
+        warnings.warn("config_path keyword argument in run_tests is" +
                       " deprecated and has no effect.", DeprecationWarning)
     if environment_name is not None:
-        warnings.warn("environment_name keyword argument in run_tests is " + 
+        warnings.warn("environment_name keyword argument in run_tests is " +
                       "deprecated and has no effect.", DeprecationWarning)
 
-    
+
 
     publishers = publishers or []
     publishers.append(junit.JUnitPublisher("results.xml"))
@@ -115,7 +115,7 @@ def _run_validations(validations, reporter, processes=1, timeout=60):
                 validation.group not in group_failures):
             group_failures[validation.group] = []
 
-    
+
     manager = multiprocessing.Manager()
     for order_set in ordered_validations:
         immutable_group_failures = dict(group_failures)
@@ -127,7 +127,7 @@ def _run_validations(validations, reporter, processes=1, timeout=60):
             p.join(timeout)
             if p.is_alive():
                 #job is taking too long, kill it
-                #this is messy, but we assume that if something hit the 
+                #this is messy, but we assume that if something hit the
                 #general alarmageddon timeout, then it's stuck somewhere
                 #and we can't stop it nicely
                 p.terminate()
@@ -214,28 +214,37 @@ def construct_publishers(config):
     :param config: Config object to construct the publishers from.
 
     """
+    environment = config.environment_name()
+    env_config = config.environment_config
     publishers = []
+
     try:
-        publishers.append(hipchat.HipChatPublisher(
-            config["hipchat_host"],
-            config["hipchat_token"],
-            config.environment_name(),
-            config["hipchat_room"],
-            Priority.NORMAL))
+        publishers.append(
+            hipchat.HipChatPublisher(
+                api_end_point = env_config["hipchat_host"],
+                api_token = env_config["hipchat_token"],
+                environment = environment,
+                room_name = env_config["hipchat_room"],
+                priority_threshold = Priority.NORMAL))
     except KeyError:
         pass
+
     try:
         publishers.append(pagerduty.PagerDutyPublisher(
-            config["pagerduty_host"],
-            config["pagerduty_token"],
-            Priority.CRITICAL))
+            api_end_point = env_config["pagerduty_host"],
+            api_key = env_config["pagerduty_token"],
+            environment = environment,
+            priority_threshold = Priority.CRITICAL))
     except KeyError:
         pass
+
     try:
         publishers.append(graphite.GraphitePublisher(
-            config["graphite_host"],
-            config.get("graphite_port"),
-            Priority.LOW))
+            host = env_config["graphite_host"],
+            port = env_config["graphite_port"],
+            environment = environment,
+            priority_threshold = Priority.LOW))
     except KeyError:
         pass
+
     return publishers

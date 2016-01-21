@@ -56,7 +56,7 @@ class ExpectedJsonEquality(ExpectedJsonPredicate):
                     .format(
                         self.json_property_path, expected_value, actual_value))
         else:
-            if not actual_value or actual_value != expected_value:
+            if actual_value is None or actual_value != expected_value:
                 validation.fail(
                     ("expected JSON property {0}"
                      " to be '{1}', actual value: '{2}'")
