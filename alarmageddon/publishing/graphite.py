@@ -4,6 +4,10 @@ import statsd
 
 from alarmageddon.publishing.publisher import Publisher
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 class GraphitePublisher(Publisher):
     """A Publisher that sends results to Graphite.
@@ -33,6 +37,11 @@ class GraphitePublisher(Publisher):
         if not host:
             raise ValueError("host parameter is required")
 
+        logger.debug("Constructing publisher with host:{}, port:{}, failed counter:{},"
+                "passed counter:{}, prefix:{}, priority_threshold:{}, environment:{}"
+                .format(host, port, failed_tests_counter, passed_tests_counter,
+                    prefix, priority_threshold, environment))
+
         Publisher.__init__(self, "Graphite",
                            priority_threshold=priority_threshold,
                            environment=environment)
@@ -58,12 +67,20 @@ class GraphitePublisher(Publisher):
         the result.
 
         """
+
+        logger.debug("Checking if we should send {}".format(result))
         if self.will_publish(result):
             if result.is_failure():
+                logger.info("Sending {} to {}".format(result,
+                    self._failed_tests_counter))
                 self._graphite.incr(self._failed_tests_counter)
             else:
+                logger.info("Sending {} to {}".format(result,
+                    self._passed_tests_counter))
                 self._graphite.incr(self._passed_tests_counter)
             if result.timer_name:
+                logger.info("Sending {} to {}".format(result,
+                    result.timer_name))
                 self._graphite.gauge(result.timer_name, result.time)
 
     def __repr__(self):

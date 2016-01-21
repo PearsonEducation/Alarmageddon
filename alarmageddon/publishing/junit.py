@@ -3,6 +3,9 @@ from alarmageddon.publishing.publisher import Publisher
 
 import xml.etree.cElementTree as ET
 
+import logging
+
+logger = logging.getLogger(__name__)
 
 class JUnitPublisher(Publisher):
     """A Publisher that writes results to JUnit formatted XML.
@@ -17,6 +20,10 @@ class JUnitPublisher(Publisher):
                  environment=None):
         if not filename:
             raise ValueError("filename parameter is required")
+
+        logger.debug("Constructing publisher with filename:{},"
+                "priority_threshold:{}, environment:{}"
+                .format(filename, priority_threshold, environment))
 
         Publisher.__init__(self, "JUnit",
                            priority_threshold=priority_threshold,

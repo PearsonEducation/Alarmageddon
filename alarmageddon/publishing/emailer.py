@@ -13,6 +13,10 @@ from email.MIMEMultipart import MIMEMultipart
 from email.MIMEText import MIMEText
 from email import Utils
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 def enrich(validation, email_settings, runtime_context=None):
     """ Enriches the validation with a custom email message.
@@ -44,6 +48,8 @@ def enrich(validation, email_settings, runtime_context=None):
     the Jinja templates defined in email_settings.
 
     """
+
+    logger.debug("Enriching {}".format(validation))
 
     if not validation:
         raise ValueError("validation is required.")
@@ -136,6 +142,7 @@ class SimpleEmailPublisher(Publisher):
 
         """
 
+        logger.debug("Checking if we should send {}".format(result))
         if result.is_failure() and self.will_publish(result):
 
             message_body = result.description()
@@ -146,6 +153,8 @@ class SimpleEmailPublisher(Publisher):
                                          self.recipient_addresses,
                                          message_subject,
                                          message_body)
+
+            logger.debug("Sending {} to {} from server {}:{}".format(result, self.recipient_addresses, self.host, self.port))
 
             """ A note regarding recipient addresses:
 
