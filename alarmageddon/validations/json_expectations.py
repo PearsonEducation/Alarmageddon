@@ -103,7 +103,7 @@ class ExpectedJsonValueGreaterThan(ExpectedJsonPredicate):
             validation.fail(
                 "missing JSON property {0}".format(self.json_property_path))
         elif float(actual_value) <= float(expected_value):
-            validation.fail("expected JSON property {0} to be less " +
+            validation.fail("expected JSON property {0} to be greater " +
                             "than {1:.2f} but it was {2:.2f}"
                             .format(self.json_property_path,
                                     float(expected_value),
