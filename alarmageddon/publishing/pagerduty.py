@@ -9,6 +9,10 @@ import time
 import hashlib
 import warnings
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 MAX_LEN = 1024
 
 
@@ -32,6 +36,9 @@ class PagerDutyPublisher(Publisher):
             raise ValueError("api_end_point parameter is required")
         if not api_key:
             raise ValueError("api_key parameter is required")
+
+        logger.debug("Constructing publisher with endpoint:{}, key:{}, priority_threshold:{}, environment:{}"
+                .format(api_end_point, api_key[:5]+'...', priority_threshold, environment))
 
         Publisher.__init__(self, "PagerDuty",
                            priority_threshold=priority_threshold,
@@ -68,6 +75,8 @@ class PagerDutyPublisher(Publisher):
         hasher = hashlib.md5()
         hasher.update(message)
         pagerduty_id = hasher.hexdigest()
+
+        logger.debug("Generated id {} for {}".format(pagerduty_id, result))
         return pagerduty_id
 
     def _construct_message(self, result):
@@ -87,6 +96,8 @@ class PagerDutyPublisher(Publisher):
         responses.
 
         """
+
+        logger.debug("Checking if we should send {}".format(result))
         if result.is_failure() and self.will_publish(result):
             message = self._construct_message(result)
             headers = {
@@ -101,10 +112,12 @@ class PagerDutyPublisher(Publisher):
             })
 
             #exponential backoff
+            logger.debug("Sending send {}".format(result))
             for i in xrange(4):
                 resp = requests.post(self._api_end_point,
                                      data=data, headers=headers, stream=True)
 
+                logger.debug("Response from PagerDuty: {}".format(resp.status_code))
                 if 200 <= resp.status_code < 300:
                     break
                 elif resp.status_code == 403 or resp.status_code >= 500:

@@ -8,6 +8,10 @@ import collections
 from alarmageddon.publishing.publisher import Publisher
 from alarmageddon.publishing.exceptions import PublishFailure
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 FALLBACK_TEXT = "There were Alarmageddon failures"
 
 
@@ -39,6 +43,9 @@ class SlackPublisher(Publisher):
     """
 
     def __init__(self, hook_url, environment, priority_threshold=None):
+        logger.debug("Constructing publisher with url:{}, priority_threshold:{}, environment:{}"
+                .format(hook_url, priority_threshold, environment))
+
         if not hook_url:
             raise ValueError("hook_url parameter is required")
         if not environment:
@@ -124,7 +131,7 @@ class SlackPublisher(Publisher):
         }
 
         data = json.dumps(message)
-        print "Posting to slack {}".format(data)
+        logger.info("Sending {} to {}".format(data, self._hook_url))
         resp = requests.post(self._hook_url, data=data, headers=headers)
 
         if resp.status_code < 200 or resp.status_code >= 300:

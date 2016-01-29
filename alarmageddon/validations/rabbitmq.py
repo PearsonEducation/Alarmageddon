@@ -9,6 +9,9 @@ from pika.adapters import BlockingConnection
 from pika.credentials import PlainCredentials
 from pika.exceptions import AMQPError
 
+import logging
+
+logger = logging.getLogger(__name__)
 
 class RabbitMqContext(object):
     """information needed to connect and interact with RabbitMQ"""

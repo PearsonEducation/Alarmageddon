@@ -7,6 +7,10 @@ import collections
 from alarmageddon.publishing.publisher import Publisher
 from alarmageddon.publishing.exceptions import PublishFailure
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 def _get_collapsed_message(results):
     """Helper function to collapse similar failures together.
@@ -42,6 +46,11 @@ class HipChatPublisher(Publisher):
 
     def __init__(self, api_end_point, api_token, environment, room_name,
                  priority_threshold=None):
+
+        logger.debug("Constructing publisher with endpoint:{}, token:{}, room name:{},"
+                "priority_threshold:{}, environment:{}"
+                .format(api_end_point, api_token, room_name,
+                    priority_threshold, environment))
 
         if not api_end_point:
             raise ValueError("api_end_point parameter is required")
@@ -112,6 +121,8 @@ class HipChatPublisher(Publisher):
             "message_format": "text",
             "color": "red"
         })
+
+        logger.debug("Sending {} to {}".format(data, url))
 
         resp = requests.post(url, data=data, headers=headers, stream=True)
 

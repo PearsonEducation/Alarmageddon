@@ -8,6 +8,10 @@ from alarmageddon.validations.ssh import SshValidation
 import os
 import re
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 # The output for Cassandra's nodetool status command has changed
 # between versions.  This new parser is designed to provide a more
 # robust way of parsing the output of the nodetool status command.  It
@@ -237,6 +241,7 @@ class NodetoolStatusParser(object):
                 self.__headers = self.__parse_headers(line)
             elif found_header:
                 nodes.append(self.__parse_node(line))
+        logger.info("Found these Cassandra nodes:{}".format(nodes))
         return nodes
 
     def __parse_headers(self, line):
@@ -401,6 +406,7 @@ class CassandraStatusValidation(SshValidation):
 
         # Validate each node's properties in nodetool's nodes
         for node in nodes:
+            logger.debug("Checking node: {}".format(node))
 
             # If a node is joining the cluster, don't check it for errors.
             if node.state == State.JOINING:

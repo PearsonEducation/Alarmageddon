@@ -1,6 +1,9 @@
 """Reports test results to registered publishers."""
 
 from publishing.exceptions import PublishFailure
+import logging
+
+logger = logging.getLogger(__name__)
 
 class ReportingFailure(Exception):
     """An exception that aggregates multiple PublishFailures.
@@ -35,12 +38,14 @@ class Reporter(object):
         Called by pytest, through the Alarmageddon :py:class:`.plugin`.
 
         """
+        logger.debug("Collecting {}".format(result))
         self._reports.append(result)
 
     def report(self):
         """Send reports to all publishers"""
         errors = []
         for publisher in self.publishers:
+            logger.debug("Reporting to {}".format(publisher))
             try:
                 publisher.send_batch(self._reports)
             except PublishFailure,e:

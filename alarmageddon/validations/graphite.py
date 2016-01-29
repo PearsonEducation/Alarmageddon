@@ -11,6 +11,10 @@ from alarmageddon.validations.graphite_expectations import \
     AverageLessThanExpectation, \
     AverageGreaterThanExpectation
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 class GraphiteContext(object):
     """Create one of these and then pass it to all of the
@@ -126,7 +130,9 @@ class GraphiteValidation(Validation):
 
         """
         url = self._build_url()
+        logger.debug("Hitting graphite server at {}".format(url))
         resp = requests.get(url)
+        logger.debug("Graphite response: {}".format(resp))
         if resp.status_code < 200 or resp.status_code >= 300:
             self.fail(("Could not get data from Graphite.  " +
                        "URL: {0}, Metric: {1}, Status Code: {2}," +

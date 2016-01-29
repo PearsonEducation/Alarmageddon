@@ -8,6 +8,9 @@ from alarmageddon.validations.ssh import SshValidation
 import re
 from collections import Counter
 
+import logging
+
+logger = logging.getLogger(__name__)
 
 class KafkaStatusValidation(SshValidation):
 

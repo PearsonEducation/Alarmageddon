@@ -16,6 +16,10 @@ from fabric.context_managers import settings
 from fabric.network import disconnect_all
 from alarmageddon.validations.validation import Validation, Priority
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 class SshContext(object):
     """Context that SSH commands execute in: the user and the user's key file.
@@ -183,6 +187,7 @@ class SshCommandValidation(SshValidation):
         else:
             output = run(self.command,
                          combine_stderr=True, timeout=self.timeout)
+        logger.info("Got output {} from host {}".format(output, host))
         exit_code = output.return_code
         for expectation in self.expectations:
             expectation.validate(self, host, output, exit_code)
