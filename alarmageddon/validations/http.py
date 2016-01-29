@@ -19,6 +19,9 @@ from alarmageddon.validations.http_expectations import \
     ExpectContainsText, \
     _ExpectedStatusCodes
 
+import logging
+
+logger = logging.getLogger(__name__)
 
 class HttpValidation(Validation):
     """A Validation that executes an HTTP request and then performs zero or
@@ -146,11 +149,13 @@ class HttpValidation(Validation):
     def perform(self, group_failures):
         """Perform the HTTP request and validate the response."""
         for i in xrange(self._retries):
+            logger.debug("Attempt {} for {} {}".format(i, self._method, self._url))
             try:
                 resp = requests.request(
                     self._method, self._url, data=self._data,
                     headers=self._headers, verify=self._get_verify(),
                     auth=self._auth, timeout=self.timeout)
+                logger.debug("Got response {}".format(resp))
                 self._elapsed_time = resp.elapsed.total_seconds()
                 self._check_expectations(resp)
                 break

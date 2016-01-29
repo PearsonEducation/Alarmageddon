@@ -13,6 +13,9 @@ from alarmageddon.result import Success, Failure
 
 from alarmageddon import banner
 
+import logging
+
+logger = logging.getLogger(__name__)
 
 def load_config(config_path, environment_name):
     """Helper method for loading a :py:class:`~alarmageddon.config.Config`
