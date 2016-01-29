@@ -29,7 +29,7 @@ def load_config(config_path, environment_name):
 
 def run_tests(validations, publishers=None, config_path=None,
               environment_name=None, config=None, dry_run=False,
-              processes=1, print_banner=True, timeout=60):
+              processes=1, print_banner=True, timeout=60, timeout_retries=2):
     """Main entry point into Alarmageddon.
 
     Run the given validations and report them to given publishers.
@@ -85,10 +85,11 @@ def run_tests(validations, publishers=None, config_path=None,
 
     if not dry_run:
         # run all of the tests
-        _run_validations(validations, Reporter(publishers), processes, timeout)
+        _run_validations(validations, Reporter(publishers), processes,
+                timeout, timeout_retries)
 
 
-def _run_validations(validations, reporter, processes=1, timeout=60):
+def _run_validations(validations, reporter, processes=1, timeout=60, timeout_retries=3):
     """ Run the given validations and publish the results
 
     Sort validations by order and then run them. All results are logged
@@ -124,16 +125,21 @@ def _run_validations(validations, reporter, processes=1, timeout=60):
         immutable_group_failures = dict(group_failures)
         results = manager.list()
         for valid in order_set:
-            #TODO: parallelize
-            p = multiprocessing.Process(target=_perform, args=(valid, immutable_group_failures, results))
-            p.start()
-            p.join(timeout)
-            if p.is_alive():
-                #job is taking too long, kill it
-                #this is messy, but we assume that if something hit the
-                #general alarmageddon timeout, then it's stuck somewhere
-                #and we can't stop it nicely
-                p.terminate()
+            for i in xrange(timeout_retries):
+                #TODO: parallelize
+                p = multiprocessing.Process(target=_perform, args=(valid, immutable_group_failures, results))
+                p.start()
+                p.join(timeout)
+                if p.is_alive():
+                    #job is taking too long, kill it
+                    #this is messy, but we assume that if something hit the
+                    #general alarmageddon timeout, then it's stuck somewhere
+                    #and we can't stop it nicely
+                    p.terminate()
+                    logger.warn("Validation {} ran for longer than {}".format(valid, timeout))
+                else:
+                    break
+            else:
                 results.append(Failure(valid.name, valid,
                                        "{} failed to terminate (ran for {}s)".format(valid,timeout),
                                        time=timeout))
