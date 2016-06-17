@@ -59,6 +59,10 @@ class GraphitePublisher(Publisher):
         self._graphite = statsd.StatsClient(
             host=self._host, prefix=self._prefix, port=self._port)
 
+    def sanitize(self, text):
+        #graphite doesn't like colons
+        return text.replace(":",".")
+
     def send(self, result):
         """Sends a result to Graphite.
 
@@ -81,7 +85,7 @@ class GraphitePublisher(Publisher):
             if result.timer_name:
                 logger.info("Sending {} to {}".format(result,
                     result.timer_name))
-                self._graphite.gauge(result.timer_name, result.time)
+                self._graphite.gauge(self.sanitize(result.timer_name), result.time)
 
     def __repr__(self):
         return "Graphite Publisher: {}:{} with prefix {} ({}/{}). {}".format(

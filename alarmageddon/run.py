@@ -159,15 +159,21 @@ def _perform(validation, immutable_group_failures, results):
     start = time.time()
     try:
         validation.perform(immutable_group_failures)
-        result = Success(validation.name, validation,
-                         time=time.time() - start)
+        try:
+            runtime = validation.get_elapsed_time()
+        except NotImplementedError:
+            runtime = time.time() - start
+        if validation.timeout is not None and runtime > validation.timeout:
+            result = Failure(validation.name, validation,
+                    "{} ran for {} (exceeded timeout of {})".format(
+                        validation, runtime, validation.timeout),
+                             time=runtime)
+        else:
+            result = Success(validation.name, validation,
+                             time=runtime)
     except Exception, e:
         result = Failure(validation.name, validation, str(e),
                          time=time.time() - start)
-    try:
-        result.time = validation.get_elapsed_time()
-    except NotImplementedError:
-        pass
 
     #appending is atomic
     results.append(result)

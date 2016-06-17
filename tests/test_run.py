@@ -191,3 +191,13 @@ def test_run_validations_without_timeout_hangs(env, processes):
     validation = NeverFinish("shouldn't finish but will")
     run._run_validations([validation], reporter, processes, timeout)
     assert not reporter._reports[0].is_failure()
+
+def test_run_validations_fails_on_slow_success(env, processes):
+    reporter = env["reporter"]
+    publishers = [MockPublisher()]
+    reporter.publishers = publishers
+    validation = Validation("success")
+    validation.perform = slow_success
+    validation.timeout = 1
+    run._run_validations([validation], reporter, processes)
+    assert reporter._reports[0].is_failure()
