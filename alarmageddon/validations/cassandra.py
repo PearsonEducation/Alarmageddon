@@ -204,7 +204,7 @@ class Node(object):
 
     def __str__(self):
         return ("Address: %s, Status: %s, State: %s, Load: %s, " +
-                "Tokens: %d, Owns: %0.2f, Host ID: %s, Rack: %s") % (
+                "Tokens: %d, Owns: %s, Host ID: %s, Rack: %s") % (
                     self.ip_address, Status.to_text(self.status),
                     State.to_text(self.state), self.load, self.tokens,
                     self.owns, self.host_id, self.rack)
@@ -296,7 +296,13 @@ class NodetoolStatusParser(object):
             return None
 
     def __get_owns(self, line):
-        return _get_percent(self.__get_field('owns', line))
+        # The following Cassandra issue (https://issues.apache.org/jira/browse/CASSANDRA-10176) causes
+        # question mark characters (?) to appear in the 'Owns' column of nodetool status' output.
+        owns = self.__get_field('owns', line)
+        if owns == '?':
+            return None
+        else:
+            return _get_percent(owns)
 
     def __get_host_id(self, line):
         return self.__get_field('host id', line)
@@ -325,13 +331,6 @@ class NodetoolStatusParser(object):
             if header.name.lower() == name.lower():
                 return header
         return None
-
-def _get_percentage(text):
-    """Converts strings like '12.2' or '32.4%' into floating point numbers."""
-    text = text.strip()
-    if text.endswith('%'):
-        text = text[:-1]
-    return float(text)
 
 
 class CassandraStatusValidation(SshValidation):
@@ -436,7 +435,3 @@ class CassandraStatusValidation(SshValidation):
                                       "threashold of {3}")
                                       .format(node.ip_address, node.owns,
                                               self.owns_threshold))
-            else:
-                self.fail_on_host(host,
-                                  ("Expected nodetool to include an ownership " +
-                                  "percentage but got: {0}").format(node.owns))

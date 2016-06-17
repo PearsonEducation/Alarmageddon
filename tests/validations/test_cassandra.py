@@ -23,7 +23,6 @@ UN  10.168.4.76    64.07 GB   256     16.4%  a5cc2101-4806-47d6-9228-5a4a45e047f
 UN  10.168.7.208   85.2 GB    256     21.9%  c56f5b4a-4863-4a24-a2fd-ee3f82baebf8  1c
 UN  10.168.4.72    83.75 GB   256     21.2%  dc8cbbdc-d95f-4836-884e-2e12f4adb13a  1d"""
 
-
 def test_cassandra_success(monkeypatch, tmpdir):
     ssh_ctx = ssh.SshContext("ubuntu", get_mock_key_file(tmpdir))
     text = HEALTHY_OUTPUT
@@ -34,6 +33,33 @@ def test_cassandra_success(monkeypatch, tmpdir):
 
     (cassandra.CassandraStatusValidation(ssh_ctx, hosts=["127.0.0.1"])
      .perform({}))
+
+# For testing this bug: https://issues.apache.org/jira/browse/CASSANDRA-10176
+QUESTION_MARK_OUTPUT = """xss =  -ea -javaagent:/usr/share/cassandra/lib/jamm-0.2.5.jar -XX:+UseThreadPriorities -XX:ThreadPriorityPolicy=42 -Xms10240m -Xmx10240m -Xmn2048m -XX:+HeapDumpOnOutOfMemoryError -Xss256k
+Note: Ownership information does not include topology; for complete information, specify a keyspace
+Datacenter: us-east
+===================
+Status=Up/Down
+|/ State=Normal/Leaving/Joining/Moving
+--  Address        Load       Tokens  Owns   Host ID                               Rack
+UN  10.168.7.222   77.82 GB   256      ?     27600dd2-9ebf-4501-820c-37dec6ea2e33  1c
+UN  10.168.14.117  80.9 GB    256      ?     064fd4da-6af8-4647-826c-a68ba038bc8d  1b.NORTH
+UN  10.168.4.76    64.07 GB   256      ?     a5cc2101-4806-47d6-9228-5a4a45e047fc  1d
+UN  10.168.7.208   85.2 GB    256      ?     c56f5b4a-4863-4a24-a2fd-ee3f82baebf8  1c
+UN  10.168.4.72    83.75 GB   256      ?     dc8cbbdc-d95f-4836-884e-2e12f4adb13a  1d"""
+
+
+def test_cassandra_success_with_question_marks_in_owns(monkeypatch, tmpdir):
+    ssh_ctx = ssh.SshContext("ubuntu", get_mock_key_file(tmpdir))
+    text = QUESTION_MARK_OUTPUT
+    monkeypatch.setattr(ssh, "run",
+                        lambda x: get_mock_ssh_text(text, 0))
+    monkeypatch.setattr(cassandra, "run",
+                        lambda x: get_mock_ssh_text(text, 0))
+
+    (cassandra.CassandraStatusValidation(ssh_ctx, hosts=["127.0.0.1"])
+     .perform({}))
+
 
 
 HEALTHY_OUTPUT_WITHOUT_PERCENT_SIGNS = """xss =  -ea -javaagent:/usr/share/cassandra/lib/jamm-0.2.5.jar -XX:+UseThreadPriorities -XX:ThreadPriorityPolicy=42 -Xms10240m -Xmx10240m -Xmn2048m -XX:+HeapDumpOnOutOfMemoryError -Xss256k
