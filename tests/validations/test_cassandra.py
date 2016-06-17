@@ -46,7 +46,10 @@ UN  10.168.7.222   77.82 GB   256      ?     27600dd2-9ebf-4501-820c-37dec6ea2e3
 UN  10.168.14.117  80.9 GB    256      ?     064fd4da-6af8-4647-826c-a68ba038bc8d  1b.NORTH
 UN  10.168.4.76    64.07 GB   256      ?     a5cc2101-4806-47d6-9228-5a4a45e047fc  1d
 UN  10.168.7.208   85.2 GB    256      ?     c56f5b4a-4863-4a24-a2fd-ee3f82baebf8  1c
-UN  10.168.4.72    83.75 GB   256      ?     dc8cbbdc-d95f-4836-884e-2e12f4adb13a  1d"""
+UN  10.168.4.72    83.75 GB   256      ?     dc8cbbdc-d95f-4836-884e-2e12f4adb13a  1d
+
+Note: Non-system keyspaces don't have the same replication settings, effective ownership information is meaningless
+"""
 
 
 def test_cassandra_success_with_question_marks_in_owns(monkeypatch, tmpdir):

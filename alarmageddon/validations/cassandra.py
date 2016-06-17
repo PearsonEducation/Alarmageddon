@@ -240,6 +240,11 @@ class NodetoolStatusParser(object):
                 found_header = True
                 self.__headers = self.__parse_headers(line)
             elif found_header:
+                # If we've already parsed one node and we find a blank line, ignore the rest of the
+                # output because it's not information about nodes; it's some other text output that
+                # we won't parse at the moment.
+                if nodes and not line.strip():
+                    break
                 nodes.append(self.__parse_node(line))
         logger.info("Found these Cassandra nodes:{}".format(nodes))
         return nodes
