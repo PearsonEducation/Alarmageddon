@@ -4,6 +4,7 @@ from alarmageddon.validations.exceptions import ValidationFailure
 import pytest
 from validation_mocks import get_mock_key_file, get_mock_ssh_text
 
+_CLUSTER_NAME='widget streams'
 
 def test_kafka_success(monkeypatch, tmpdir):
     ssh_ctx = ssh.SshContext("ubuntu", get_mock_key_file(tmpdir))
@@ -14,7 +15,8 @@ def test_kafka_success(monkeypatch, tmpdir):
 
     (kafka.KafkaStatusValidation(ssh_ctx,
                                  zookeeper_nodes="1.2.3.4:2181",
-                                 hosts=["127.0.0.1"])
+                                 hosts=["127.0.0.1"],
+                                 cluster_name=_CLUSTER_NAME)
      .perform({}))
 
 
@@ -26,7 +28,8 @@ def test_kafka_duplicate_partiton(monkeypatch, tmpdir):
     with pytest.raises(ValidationFailure):
         (kafka.KafkaStatusValidation(ssh_ctx,
                                      zookeeper_nodes="1.2.3.4:2181",
-                                     hosts=["127.0.0.1"])
+                                     hosts=["127.0.0.1"],
+                                     cluster_name=_CLUSTER_NAME)
          .perform({}))
 
 
@@ -38,7 +41,8 @@ def test_kafka_multiple_duplicate_partition(monkeypatch, tmpdir):
     with pytest.raises(ValidationFailure):
         (kafka.KafkaStatusValidation(ssh_ctx,
                                      zookeeper_nodes="1.2.3.4:2181",
-                                     hosts=["127.0.0.1"])
+                                     hosts=["127.0.0.1"],
+                                     cluster_name=_CLUSTER_NAME)
          .perform({}))
 
 
@@ -50,7 +54,8 @@ def test_kafka_command_not_found(monkeypatch, tmpdir):
     with pytest.raises(ValidationFailure):
         (kafka.KafkaStatusValidation(ssh_ctx,
                                      zookeeper_nodes="1.2.3.4:2181",
-                                     hosts=["127.0.0.1"])
+                                     hosts=["127.0.0.1"],
+                                     cluster_name=_CLUSTER_NAME)
          .perform({}))
 
 
@@ -71,7 +76,8 @@ def test_kafka_missing_zookeeper(monkeypatch, tmpdir):
     with pytest.raises(ValidationFailure):
         (kafka.KafkaStatusValidation(ssh_ctx,
                                      zookeeper_nodes="1.2.3.4:2181",
-                                     hosts=["127.0.0.1"])
+                                     hosts=["127.0.0.1"],
+                                     cluster_name=_CLUSTER_NAME)
          .perform({}))
 
 
@@ -90,6 +96,7 @@ def test_repr(monkeypatch, tmpdir):
     monkeypatch.setattr(kafka, "run",
                         lambda x: get_mock_ssh_text(text, 0))
     v = kafka.KafkaStatusValidation(ssh_ctx,
-                                 zookeeper_nodes="1.2.3.4:2181",
-                                 hosts=["127.0.0.1"])
+                                    zookeeper_nodes="1.2.3.4:2181",
+                                    hosts=["127.0.0.1"],
+                                    cluster_name=_CLUSTER_NAME)
     v.__repr__()

@@ -5,6 +5,8 @@ from fabric.operations import run
 from alarmageddon.validations.validation import Priority
 from alarmageddon.validations.ssh import SshValidation
 
+from alarmageddon.validations.utilities import format_node, format_cluster
+
 import os
 import re
 
@@ -124,16 +126,6 @@ def _get_percent(text):
         text = text[:-1]
 
     return float(text.strip())
-
-
-def _format_node(cluster_name, node):
-    """Formats a string representation of a node."""
-    return '<{0}[{1}]>'.format(cluster_name, node)
-
-
-def _format_cluster(cluster_name):
-    """Formats a string representation of a cluster."""
-    return _format_node(cluster_name, '*')
 
 
 class Status(object):
@@ -409,7 +401,7 @@ class CassandraStatusValidation(SshValidation):
             self.fail_on_host(host, ("An exception occurred while " +
                                          "checking Cassandra cluster health " +
                                          "on {0} ({1})").format(
-                                             _format_node(self.cluster_name, host),
+                                             format_node(self.cluster_name, host),
                                              output))
 
         parsed = NodetoolStatusParser().parse(output)
@@ -422,7 +414,7 @@ class CassandraStatusValidation(SshValidation):
             self.fail_on_host(host,
                               ("Cassandra cluster: {0} has {1} nodes but " +
                               "should have {2} nodes.").format(
-                                  _format_cluster(self.cluster_name),
+                                  format_cluster(self.cluster_name),
                                   len(nodes), self.number_nodes))
 
         # Validate each node's properties in nodetool's nodes
@@ -437,7 +429,7 @@ class CassandraStatusValidation(SshValidation):
             if node.state != self.service_state:
                 self.fail_on_host(host, ("Cassandra node {0} is in " +
                                   "state {1} but the expected state is {2}").format(
-                                      _format_node(self.cluster_name, node.ip_address),
+                                      format_node(self.cluster_name, node.ip_address),
                                       State.to_text(node.state),
                                       State.to_text(self.service_state)))
 
@@ -445,7 +437,7 @@ class CassandraStatusValidation(SshValidation):
             if node.status != self.service_status:
                 self.fail_on_host(host, ("Cassandra node {0} has " +
                                   "status {1} but the expected status is {2}").format(
-                                      _format_node(self.cluster_name, node.ip_address),
+                                      format_node(self.cluster_name, node.ip_address),
                                       Status.from_text(node.status),
                                       Status.from_text(self.service_status)))
 
@@ -456,6 +448,6 @@ class CassandraStatusValidation(SshValidation):
                                       ("Cassandra node {0} owns {1} " +
                                       "percent of the ring which exceeds " +
                                       "threshold of {2}").format(
-                                          _format_node(self.cluster_name, node.ip_address),
+                                          format_node(self.cluster_name, node.ip_address),
                                           node.owns,
                                           self.owns_threshold))
