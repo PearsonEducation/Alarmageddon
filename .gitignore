@@ -12,3 +12,4 @@ Alarmageddon.egg-info/
 build/
 dist/
 .venv/
+venv/

@@ -9,6 +9,8 @@ from alarmageddon.validations.exceptions import ValidationFailure
 import pytest
 from validation_mocks import get_mock_key_file, get_mock_ssh_text
 
+_CLUSTER_NAME='finance dept'
+
 
 HEALTHY_OUTPUT = """xss =  -ea -javaagent:/usr/share/cassandra/lib/jamm-0.2.5.jar -XX:+UseThreadPriorities -XX:ThreadPriorityPolicy=42 -Xms10240m -Xmx10240m -Xmn2048m -XX:+HeapDumpOnOutOfMemoryError -Xss256k
 Note: Ownership information does not include topology; for complete information, specify a keyspace
@@ -31,7 +33,8 @@ def test_cassandra_success(monkeypatch, tmpdir):
     monkeypatch.setattr(cassandra, "run",
                         lambda x: get_mock_ssh_text(text, 0))
 
-    (cassandra.CassandraStatusValidation(ssh_ctx, hosts=["127.0.0.1"])
+    (cassandra.CassandraStatusValidation(ssh_ctx, hosts=["127.0.0.1"],
+                                            cluster_name=_CLUSTER_NAME)
      .perform({}))
 
 # For testing this bug: https://issues.apache.org/jira/browse/CASSANDRA-10176
@@ -60,7 +63,8 @@ def test_cassandra_success_with_question_marks_in_owns(monkeypatch, tmpdir):
     monkeypatch.setattr(cassandra, "run",
                         lambda x: get_mock_ssh_text(text, 0))
 
-    (cassandra.CassandraStatusValidation(ssh_ctx, hosts=["127.0.0.1"])
+    (cassandra.CassandraStatusValidation(ssh_ctx, hosts=["127.0.0.1"],
+                                             cluster_name=_CLUSTER_NAME)
      .perform({}))
 
 
@@ -87,7 +91,8 @@ def test_cassandra_success_without_percent_signs(monkeypatch, tmpdir):
      monkeypatch.setattr(cassandra, "run",
                          lambda x: get_mock_ssh_text(text, 0))
 
-     (cassandra.CassandraStatusValidation(ssh_ctx, hosts=["127.0.0.1"])
+     (cassandra.CassandraStatusValidation(ssh_ctx, hosts=["127.0.0.1"],
+                                              cluster_name=_CLUSTER_NAME)
       .perform({}))
 
 
@@ -114,7 +119,8 @@ def test_cassandra_down(monkeypatch, tmpdir):
                         lambda x: get_mock_ssh_text(text, 0))
 
     with pytest.raises(ValidationFailure):
-        (cassandra.CassandraStatusValidation(ssh_ctx, hosts=["127.0.0.1"])
+        (cassandra.CassandraStatusValidation(ssh_ctx, hosts=["127.0.0.1"],
+                                                 cluster_name=_CLUSTER_NAME)
          .perform({}))
 
 
@@ -142,7 +148,8 @@ def test_cassandra_threshold(monkeypatch, tmpdir):
 
     with pytest.raises(ValidationFailure):
         (cassandra.CassandraStatusValidation(ssh_ctx, owns_threshold=40,
-                                             hosts=["127.0.0.1"])
+                                                 hosts=["127.0.0.1"],
+                                                 cluster_name=_CLUSTER_NAME)
          .perform({}))
 
 
@@ -197,7 +204,8 @@ def test_cassandra_node_count(monkeypatch, tmpdir):
 
     with pytest.raises(ValidationFailure):
         (cassandra.CassandraStatusValidation(ssh_ctx, number_nodes=5,
-                                             hosts=["127.0.0.1"])
+                                             hosts=["127.0.0.1"],
+                                             cluster_name=_CLUSTER_NAME)
          .perform({}))
 
 
@@ -211,7 +219,8 @@ def test_no_cassandra(monkeypatch, tmpdir):
 
     with pytest.raises(ValidationFailure):
         (cassandra.CassandraStatusValidation(ssh_ctx, number_nodes=5,
-                                             hosts=["127.0.0.1"])
+                                             hosts=["127.0.0.1"],
+                                             cluster_name=_CLUSTER_NAME)
          .perform({}))
 
 
@@ -229,7 +238,8 @@ def test_stack_trace(monkeypatch, tmpdir):
 
     with pytest.raises(ValidationFailure):
         (cassandra.CassandraStatusValidation(ssh_ctx, number_nodes=4,
-                                             hosts=["127.0.0.1"])
+                                             hosts=["127.0.0.1"],
+                                             cluster_name=_CLUSTER_NAME)
          .perform({}))
 
 
@@ -256,7 +266,8 @@ def test_ignore_joining_nodes(monkeypatch, tmpdir):
                         lambda x: get_mock_ssh_text(text, 0))
 
     (cassandra.CassandraStatusValidation(ssh_ctx, number_nodes=4,
-                                         hosts=["127.0.0.1"])
+                                             hosts=["127.0.0.1"],
+                                             cluster_name=_CLUSTER_NAME)
      .perform({}))
 
 
@@ -272,7 +283,8 @@ def test_extra_nodes(monkeypatch, tmpdir):
                         lambda x: get_mock_ssh_text(text, 0))
 
     (cassandra.CassandraStatusValidation(ssh_ctx, number_nodes=4,
-                                         hosts=["127.0.0.1"])
+                                             hosts=["127.0.0.1"],
+                                             cluster_name=_CLUSTER_NAME)
      .perform({}))
 
 
@@ -442,7 +454,8 @@ def test_zero_ownership_should_not_fail(monkeypatch, tmpdir):
     monkeypatch.setattr(cassandra, "run",
                         lambda x: get_mock_ssh_text(text, 0))
 
-    (cassandra.CassandraStatusValidation(ssh_ctx, hosts=["127.0.0.1"])
+    (cassandra.CassandraStatusValidation(ssh_ctx, hosts=["127.0.0.1"],
+                                             cluster_name=_CLUSTER_NAME)
      .perform({}))
 
 
@@ -454,5 +467,6 @@ def test_repr(monkeypatch, tmpdir):
     monkeypatch.setattr(cassandra, "run",
                         lambda x: get_mock_ssh_text(text, 0))
 
-    (cassandra.CassandraStatusValidation(ssh_ctx, hosts=["127.0.0.1"])
+    (cassandra.CassandraStatusValidation(ssh_ctx, hosts=["127.0.0.1"],
+                                             cluster_name=_CLUSTER_NAME)
      .__repr__())

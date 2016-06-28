@@ -126,6 +126,16 @@ def _get_percent(text):
     return float(text.strip())
 
 
+def _format_node(cluster_name, node):
+    """Formats a string representation of a node."""
+    return '<{0}[{1}]>'.format(cluster_name, node)
+
+
+def _format_cluster(cluster_name):
+    """Formats a string representation of a cluster."""
+    return _format_node(cluster_name, '*')
+
+
 class Status(object):
     """An enum-like object that represents the status of a Cassandra Node
 
@@ -360,6 +370,9 @@ class CassandraStatusValidation(SshValidation):
 
     :param hosts: The hosts to connect to.
 
+    :param cluster_name: the name of the cluster (helps when you're monitoring
+                         multiple clusters.  Defaults to 'anonymous'.
+
     .. note:
 
         This is not designed for multi region Cassandra clusters.
@@ -368,7 +381,7 @@ class CassandraStatusValidation(SshValidation):
     def __init__(self, ssh_context, service_state="UN",
                  number_nodes=5, owns_threshold=40,
                  priority=Priority.NORMAL, timeout=None,
-                 hosts=None):
+                 hosts=None, cluster_name='anonymous'):
         SshValidation.__init__(self, ssh_context,
                                "Cassandra nodetool status",
                                priority=priority,
@@ -386,6 +399,7 @@ class CassandraStatusValidation(SshValidation):
             
         self.number_nodes = number_nodes
         self.owns_threshold = owns_threshold
+        self.cluster_name = cluster_name
 
     def perform_on_host(self, host):
         """Runs nodetool status and parses the output."""
@@ -393,8 +407,10 @@ class CassandraStatusValidation(SshValidation):
 
         if "Exception" in output:
             self.fail_on_host(host, ("An exception occurred while " +
-                              "checking Cassandra cluster health on {0} ({1})")
-                              .format((host, output)))
+                                         "checking Cassandra cluster health " +
+                                         "on {0} ({1})").format(
+                                             _format_node(self.cluster_name, host),
+                                             output))
 
         parsed = NodetoolStatusParser().parse(output)
         self.check(host, parsed)
@@ -404,9 +420,10 @@ class CassandraStatusValidation(SshValidation):
         #Number of nodes check
         if len(nodes) < self.number_nodes:
             self.fail_on_host(host,
-                              ("Cassandra cluster has {0} nodes but " +
-                              "should have {1} nodes.")
-                              .format(len(nodes), self.number_nodes))
+                              ("Cassandra cluster: {0} has {1} nodes but " +
+                              "should have {2} nodes.").format(
+                                  _format_cluster(self.cluster_name),
+                                  len(nodes), self.number_nodes))
 
         # Validate each node's properties in nodetool's nodes
         for node in nodes:
@@ -420,14 +437,15 @@ class CassandraStatusValidation(SshValidation):
             if node.state != self.service_state:
                 self.fail_on_host(host, ("Cassandra node {0} is in " +
                                   "state {1} but the expected state is {2}").format(
-                                      node.ip_address, State.to_text(node.state),
+                                      _format_node(self.cluster_name, node.ip_address),
+                                      State.to_text(node.state),
                                       State.to_text(self.service_state)))
 
             # check for status
             if node.status != self.service_status:
                 self.fail_on_host(host, ("Cassandra node {0} has " +
                                   "status {1} but the expected status is {2}").format(
-                                      node.ip_address,
+                                      _format_node(self.cluster_name, node.ip_address),
                                       Status.from_text(node.status),
                                       Status.from_text(self.service_status)))
 
@@ -436,7 +454,8 @@ class CassandraStatusValidation(SshValidation):
                 if node.owns > self.owns_threshold:
                     self.fail_on_host(host,
                                       ("Cassandra node {0} owns {1} " +
-                                      "percent of the ring which exceeds" +
-                                      "threashold of {3}")
-                                      .format(node.ip_address, node.owns,
-                                              self.owns_threshold))
+                                      "percent of the ring which exceeds " +
+                                      "threshold of {2}").format(
+                                          _format_node(self.cluster_name, node.ip_address),
+                                          node.owns,
+                                          self.owns_threshold))
