@@ -105,6 +105,16 @@ Sends emails on test failure. The SimpleEmailPublisher will email the text of th
 Changelog
 =========
 
+1.0.4
+* Added environment information to published messages.
+* Fixed JSON validation bug where 0 could never be matched.
+* Added internal logging.
+* Fixed errors in JSON validation messages.
+* Added global timeout that terminates and fails validations that run too long.
+* Now removing colons from Graphite counter names.
+* Cassandra and Kafka validations now include cluster name.
+* Updated Cassandra validation to work with more Cassandra versions.
+
 1.0.3
 * Added a forced timeout that will terminate a validation if it runs for too long.
 * PagerDuty incident IDs are now tied to the contents of the validation.
