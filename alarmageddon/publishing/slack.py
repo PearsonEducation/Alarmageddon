@@ -58,7 +58,7 @@ class SlackPublisher(Publisher):
         self._hook_url = hook_url
 
     def __str__(self):
-        return "Slack: {}".format(self.hook_url)
+        return "Slack: {}".format(self._hook_url)
 
     def send(self, result):
         """sends a result to Slack if the result is a faliure."""
