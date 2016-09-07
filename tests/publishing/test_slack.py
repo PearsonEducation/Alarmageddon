@@ -35,6 +35,10 @@ def test_repr():
     slack = new_publisher()
     slack.__repr__()
 
+def test_str():
+    slack = new_publisher()
+    str(slack)
+
 
 def testSendSuccess(no_post, monkeypatch):
     slack = new_publisher()
