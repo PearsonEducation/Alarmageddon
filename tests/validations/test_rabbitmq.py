@@ -33,6 +33,11 @@ def test_repr():
      .__repr__())
 
 
+def test_str():
+    context = RabbitMqContext("host", 88, "name", "password")
+    str(RabbitMqValidation(context, "name", "queue", 500))
+
+
 def test_expected_queue_size():
     context = RabbitMqContext("host", 88, "name", "password")
     (RabbitMqValidation(context, "name", "queue", 500)

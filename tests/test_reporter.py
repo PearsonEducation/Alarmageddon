@@ -13,6 +13,11 @@ def test_repr(env):
     reporter = env["reporter"]
     reporter.__repr__()
 
+
+def test_str(env):
+    reporter = env["reporter"]
+    str(reporter)
+
 def test_reporter_correctly_sends_success(env, valid):
     reporter = env["reporter"]
     publishers = []

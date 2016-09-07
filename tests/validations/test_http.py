@@ -30,6 +30,12 @@ def test_repr():
     validation.__repr__()
 
 
+def test_str():
+    name = "http://thread-stats.qaprod.pearsonopenclass.com/version"
+    validation = HttpValidation.get(name)
+    str(validation)
+
+
 def test_http_name_get():
     name = "http://thread-stats.qaprod.pearsonopenclass.com/version"
     validation = HttpValidation.get(name)

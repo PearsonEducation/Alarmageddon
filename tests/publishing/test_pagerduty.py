@@ -68,6 +68,11 @@ def test_repr(no_post):
     pager.__repr__()
 
 
+def test_str(no_post):
+    pager = new_publisher()
+    str(pager)
+
+
 def testSendSuccess(no_post):
     pager = new_publisher()
     v = Validation("low", priority=Priority.CRITICAL)

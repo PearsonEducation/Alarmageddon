@@ -9,6 +9,12 @@ def test_repr():
     v = Validation("low", priority=Priority.LOW)
     r = ValidResult("name", v)
     r.__repr__()
+
+
+def test_str():
+    v = Validation("low", priority=Priority.LOW)
+    r = ValidResult("name", v)
+    str(r)
     
 
 def test_failures_are_failures():
