@@ -11,7 +11,7 @@ class HttpPublisher(Publisher):
     """Creates an HTTP Publisher that publishes successes and/or failures
     to either one or two HTTP end points.
 
-    If you want the same URL to be published to whether or not the the
+    If you want the same URL to be published to whether or not the
     Validation result being published failed or succeeded, please
     supply only the url parameter and omit the failure_url and
     success_url parameters.
