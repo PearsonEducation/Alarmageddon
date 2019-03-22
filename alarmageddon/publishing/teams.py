@@ -37,19 +37,23 @@ class TeamsPublisher(Publisher):
     :param environment: The environment that tests are being run in.
     """
 
-    def __init__(self, hook_url, environment, priority_threshold="Priority.LOW"):
-        logger.debug("Constructing publisher with url:{}, priority_threshold:{}, environment:{}"
+    def __init__(self, hook_url, environment=None, priority_threshold=None):
+
+        logger.debug("Constructing publisher with url:{}, priority_threshold:{}, environment:()"
                 .format(hook_url, priority_threshold, environment))
 
         if not hook_url:
             raise ValueError("hook_url parameter is required")
-        if not environment:
-            raise ValueError("environment parameter is required")
-        Publisher.__init__(self, "Teams")
+
+        Publisher.__init__(self, "Teams", priority_threshold=priority_threshold)
+
         self._hook_url = hook_url
 
     def __str__(self):
-        return "Teams: {}".format(self._hook_url)
+        return "Teams: {}".format(self._hook_url, self.priority_threshold)
+
+    def __repr__(self):
+        return "Teams: {}".format(self._hook_url, self.priority_threshold)
 
     def send(self, result):
         """sends a result to Teams if the result is a failure."""
@@ -123,11 +127,10 @@ class TeamsPublisher(Publisher):
         }
 
         data = json.dumps(message)
-        print (data)
 
         logger.info("Sending {} to {}".format(data, self._hook_url))
         resp = requests.post(self._hook_url, data=data, headers=headers)
-        print (resp.text)
+
         if resp.status_code < 200 or resp.status_code >= 300:
             raise PublishFailure(self, "{0} - {1}".format(message, resp.text))
 
@@ -150,4 +153,3 @@ class TeamsPublisher(Publisher):
             return job_url
         else:
             return None
- 
