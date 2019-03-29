@@ -99,7 +99,6 @@ class TeamsPublisher(Publisher):
         if run_link is not None:
             pretext = "{} <{}|View Result>".format(pretext, run_link)
         jenkins_url = self._get_jenkins_job_url()
-        print (jenkins_url)
 
         payload = {
             "title": os.environ.get('JOB_NAME'),
