@@ -18,6 +18,14 @@ def test_simple_email_repr(smtpserver):
                                      host=smtpserver.addr[0], port=smtpserver.addr[1])
     email_pub.__repr__()
 
+
+def test_simple_email_str(smtpserver):
+    email_pub = SimpleEmailPublisher({"real_name": "test", "address": "test@test.com"},
+                                     [{"real_name": "test", "address": "test@test.com"}],
+                                     host=smtpserver.addr[0], port=smtpserver.addr[1])
+    str(email_pub)
+
+
 def test_simple_email(httpserver, smtpserver):
     email_pub = SimpleEmailPublisher({"real_name": "test", "address": "test@test.com"},
                                      [{"real_name": "test", "address": "test@test.com"}],
@@ -36,11 +44,20 @@ def test_requires_config():
     with pytest.raises(ValueError):
         EmailPublisher(config=None)
 
+
 def test_email_publisher_repr(tmpdir, smtpserver):
     config = create_configuration(tmpdir, smtp_host=smtpserver.addr[0],
                                   smtp_port=str(smtpserver.addr[1]))
     email_pub = EmailPublisher(config)
     email_pub.__repr__()
+
+
+def test_email_publisher_str(tmpdir, smtpserver):
+    config = create_configuration(tmpdir, smtp_host=smtpserver.addr[0],
+                                  smtp_port=str(smtpserver.addr[1]))
+    email_pub = EmailPublisher(config)
+    str(email_pub)
+
 
 def test_email_publisher_with_defaults(tmpdir, smtpserver):
     config = create_configuration(tmpdir, smtp_host=smtpserver.addr[0],

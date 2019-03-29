@@ -38,6 +38,10 @@ def test_repr():
     graphite = new_publisher()
     graphite.__repr__()
 
+def test_str():
+    graphite = new_publisher()
+    str(graphite)
+
 def test_send_success():
     graphite = new_publisher()
     v = Validation("low", priority=Priority.LOW)

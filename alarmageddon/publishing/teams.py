@@ -1,4 +1,4 @@
-"""Support for publishing to Slack"""
+"""Support for publishing to Teams"""
 
 import os
 import requests
@@ -17,12 +17,9 @@ FALLBACK_TEXT = "There were Alarmageddon failures"
 
 def _get_collapsed_message(results):
     """Helper function to collapse similar failures together.
-
     If several results have the same reason for failing, combine the
     results to save space and cognitive load on users.
-
     :param results: List of result objects.
-
     """
     description = results[0].description()
     names = [result.test_name() for result in results]
@@ -31,37 +28,35 @@ def _get_collapsed_message(results):
     return message
 
 
-class SlackPublisher(Publisher):
-    """A Publisher that sends results to Slack.
-
-    Publishes all failures to the provided Slack room.
-
-    :param hook_url: The Slack Hook URL
+class TeamsPublisher(Publisher):
+    """A Publisher that sends results to Teams.
+    Publishes all failures to the provided Teams room.
+    :param hook_url: The Teams Hook URL
     :param priority_threshold: Will publish validations of this priority or
       higher.
     :param environment: The environment that tests are being run in.
     """
 
-    def __init__(self, hook_url, environment, priority_threshold=None):
-        logger.debug("Constructing publisher with url:{}, priority_threshold:{}, environment:{}"
+    def __init__(self, hook_url, environment=None, priority_threshold=None):
+
+        logger.debug("Constructing publisher with url:{}, priority_threshold:{}, environment:()"
                 .format(hook_url, priority_threshold, environment))
 
         if not hook_url:
             raise ValueError("hook_url parameter is required")
-        if not environment:
-            raise ValueError("environment parameter is required")
 
-        Publisher.__init__(self, "Slack",
-                           priority_threshold=priority_threshold,
-                           environment=environment)
+        Publisher.__init__(self, "Teams", priority_threshold=priority_threshold)
 
         self._hook_url = hook_url
 
     def __str__(self):
-        return "Slack: {}".format(self._hook_url)
+        return "Teams: {}".format(self._hook_url, self.priority_threshold)
+
+    def __repr__(self):
+        return "Teams: {}".format(self._hook_url, self.priority_threshold)
 
     def send(self, result):
-        """sends a result to Slack if the result is a faliure."""
+        """sends a result to Teams if the result is a failure."""
         if result.is_failure() and self.will_publish(result):
 
             message = "(failed) Failure in {0}\nTest:{1}\nFailed because: {2}".format(
@@ -74,11 +69,10 @@ class SlackPublisher(Publisher):
                 self._get_jenkins_job_url(),
                 message)
 
-            self._send_to_slack(message_text)
+            self._send_to_teams(message_text)
 
     def send_batch(self, results):
-        """Send a batch of results to Slack.
-
+        """Send a batch of results to Teams.
         Collapses similar failures together to save space.
         """
         collapsed = collections.defaultdict(list)
@@ -89,7 +83,7 @@ class SlackPublisher(Publisher):
                 errors += 1
         if errors == 0:
             return
-        message = "{0} failure(s) in {1}:\n".format(errors, self.environment)
+        message = "{0} failure(s) :\n".format(errors)
         message += "\n".join(_get_collapsed_message(collapsed_result)
                              for collapsed_result in collapsed.itervalues())
 
@@ -98,39 +92,41 @@ class SlackPublisher(Publisher):
             self._get_jenkins_job_url(),
             message)
 
-        self._send_to_slack(message_text)
+        self._send_to_teams(message_text)
 
     def _build_message(self, FALLBACK_TEXT, run_link, text):
         pretext = "Alarmageddon run completed."
         if run_link is not None:
             pretext = "{} <{}|View Result>".format(pretext, run_link)
+        jenkins_url = self._get_jenkins_job_url()
 
         payload = {
-            "attachments": [
+            "title": os.environ.get('JOB_NAME'),
+            "text": text,
+            "potentialAction": [
                 {
-                    "fallback": FALLBACK_TEXT,
-                    "author_name": "Alarmageddon",
-                    "color": "danger",
-                    "pretext": pretext,
-                    "text": text,
-                    "mrkdwn": True
+                    "@type": "OpenUri",
+                    "name": "View Build",
+                    "targets": [{
+                                        "os": "default",
+                                        "uri": jenkins_url
+                        }]
                 }
             ]
         }
 
         return payload
 
-    def _send_to_slack(self, message):
-        """Send a message to Slack.
-
+    def _send_to_teams(self, message):
+        """Send a message to Teams.
         :param message: The message to be published.
-
         """
         headers = {
-            "Context-Type": "application/json"
+            "Content-Type": "application/json"
         }
 
         data = json.dumps(message)
+
         logger.info("Sending {} to {}".format(data, self._hook_url))
         resp = requests.post(self._hook_url, data=data, headers=headers)
 
@@ -138,10 +134,9 @@ class SlackPublisher(Publisher):
             raise PublishFailure(self, "{0} - {1}".format(message, resp.text))
 
     def _get_jenkins_job_url(self):
-        """If we're running in jenkins use enviroment vars to
-        construct a job url. If we are not in running in jenkins
+        """If we're running in jenkins use environment vars to
+        construct a job URL. If we are not in running in jenkins
         return None
-
         """
 
         jenkins_host = os.environ.get('JENKINS_URL')

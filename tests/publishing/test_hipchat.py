@@ -58,6 +58,11 @@ def test_repr():
     hipchat.__repr__()
 
 
+def test_str():
+    hipchat = new_publisher()
+    str(hipchat)
+
+
 def testSendSuccess(no_post, monkeypatch):
     hipchat = new_publisher()
     v = Validation("low", priority=Priority.LOW)

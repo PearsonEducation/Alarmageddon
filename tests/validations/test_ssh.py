@@ -78,6 +78,21 @@ def test_max_load_average(monkeypatch, tmpdir):
      .perform({}))
 
 
+def test_max_load_correctly_formats_failure(monkeypatch, tmpdir):
+    t = "18:01:46 up 62 days, 18:27,  1 user,  load average: 40.09, 0.04, 0.05"
+    monkeypatch.setattr(ssh, "run", lambda x: get_mock_ssh_text(t, 0))
+    ssh_ctx = ssh.SshContext("ubuntu", get_mock_key_file(tmpdir))
+    try:
+        (ssh.LoadAverageValidation(ssh_ctx, hosts=hosts)
+         .expect_max_1_minute_load(40)
+         .perform({}))
+
+        #we should have raised an error
+        assert False
+    except ValidationFailure, e:
+        #this is a weak check
+        assert "{0}" not in str(e)
+
 def test_max_load_correctly_fails_1_minute(monkeypatch, tmpdir):
     t = "18:01:46 up 62 days, 18:27,  1 user,  load average: 40.09, 0.04, 0.05"
     monkeypatch.setattr(ssh, "run", lambda x: get_mock_ssh_text(t, 0))
@@ -313,3 +328,12 @@ def test_repr(monkeypatch, tmpdir):
 
     (ssh.SshCommandValidation(ssh_ctx, "name", "cmd", hosts=hosts)
      .__repr__())
+
+
+def test_str(monkeypatch, tmpdir):
+    t = "18:01:46 up 62 days, 18:27,  1 user,  load average: 0.09, 0.04, 0.05"
+    monkeypatch.setattr(ssh, "run",
+                        lambda x, combine_stderr, timeout: get_mock_ssh_text(t, 0))
+    ssh_ctx = ssh.SshContext("ubuntu", get_mock_key_file(tmpdir))
+
+    str(ssh.SshCommandValidation(ssh_ctx, "name", "cmd", hosts=hosts))

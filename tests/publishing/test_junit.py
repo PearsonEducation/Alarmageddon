@@ -15,6 +15,11 @@ def test_repr():
     pub.__repr__()
 
 
+def test_str():
+    pub = JUnitPublisher("should_not_be_created.xml")
+    str(pub)
+
+
 def test_send_fails():
     pub = JUnitPublisher("should_not_be_created.xml")
     v = Validation("low", priority=Priority.CRITICAL)

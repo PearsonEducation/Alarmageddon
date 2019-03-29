@@ -100,3 +100,24 @@ def test_repr(monkeypatch, tmpdir):
                                     hosts=["127.0.0.1"],
                                     cluster_name=_CLUSTER_NAME)
     v.__repr__()
+
+
+def test_str(monkeypatch, tmpdir):
+    ssh_ctx = ssh.SshContext("ubuntu", get_mock_key_file(tmpdir))
+    text = """
+  Exception in thread "main" joptsimple.OptionMissingRequiredArgumentException: Option ['zookeeper'] requires an argument
+    at joptsimple.RequiredArgumentOptionSpec.detectOptionArgument(RequiredArgumentOptionSpec.java:49)
+    at joptsimple.ArgumentAcceptingOptionSpec.handleOption(ArgumentAcceptingOptionSpec.java:209)
+    at joptsimple.OptionParser.handleLongOptionToken(OptionParser.java:405)
+    at joptsimple.OptionParserState$2.handleArgument(OptionParserState.java:55)
+    at joptsimple.OptionParser.parse(OptionParser.java:392)
+    at kafka.admin.ListTopicCommand$.main(ListTopicCommand.scala:43)
+    at kafka.admin.ListTopicCommand.main(ListTopicCommand.scala)
+    """
+    monkeypatch.setattr(kafka, "run",
+                        lambda x: get_mock_ssh_text(text, 0))
+    v = kafka.KafkaStatusValidation(ssh_ctx,
+                                    zookeeper_nodes="1.2.3.4:2181",
+                                    hosts=["127.0.0.1"],
+                                    cluster_name=_CLUSTER_NAME)
+    str(v)

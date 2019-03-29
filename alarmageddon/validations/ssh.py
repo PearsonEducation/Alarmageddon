@@ -280,8 +280,8 @@ class LoadAverageValidation(SshValidation):
         # Check if the maximum was exceeded (if it was defined)
         if self.limits[minutes]['max'] and load > self.limits[minutes]['max']:
             self.fail_on_host(host,
-                              "{0} minute load too high on {1}.  " +
-                              "Maximum Load: {2:.2f}, Current Load: {3:.2f}"
+                              ("{0} minute load too high on {1}.  " +
+                              "Maximum Load: {2:.2f}, Current Load: {3:.2f}")
                               .format(minutes, host,
                                       self.limits[minutes]['max'],
                                       load))
@@ -289,8 +289,8 @@ class LoadAverageValidation(SshValidation):
         # Check if the Minimum was exceeded (if it was defined)
         if self.limits[minutes]['min'] and load < self.limits[minutes]['min']:
             self.fail_on_host(host,
-                              "{0} minute load too low on {1}.  " +
-                              "Minimum Load: {2:.2f}, Current Load: {3:.2f}"
+                              ("{0} minute load too low on {1}.  " +
+                              "Minimum Load: {2:.2f}, Current Load: {3:.2f}")
                               .format(minutes, host,
                                       self.limits[minutes]['min'], load))
 

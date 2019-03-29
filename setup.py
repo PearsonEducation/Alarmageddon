@@ -2,10 +2,10 @@ from setuptools import setup
 setup(
         name = "Alarmageddon",
         description = "Automated testing and reporting",
-        version = "1.0.4",
+        version = "1.0.5",
         author = "Tim Stewart, Scott Hellman",
         author_email = "timothy.stewart@pearson.com, scott.hellman@pearson.com",
-        url = "https://github.com/PearsonEducation/Alarmageddon/tarball/1.0.4",
+        url = "https://github.com/PearsonEducation/Alarmageddon/tarball/1.0.5",
         license = "Apache2",
         classifiers=[
             "Development Status :: 5 - Production/Stable",
@@ -23,6 +23,6 @@ setup(
                             "colorama==0.3.2",
                             "pycrypto==2.6.1",
                             "pika==0.9.13",
-                            "pytest>=2.4.0",
+                            "pytest==2.4.0",
                             "pytest-localserver==0.3.2"],
     )

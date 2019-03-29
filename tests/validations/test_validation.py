@@ -49,7 +49,7 @@ def test_priority_string():
 
 def test_validation_str():
     v = Validation("name")
-    v.__str__()
+    str(v)
 
 
 def test_repr():

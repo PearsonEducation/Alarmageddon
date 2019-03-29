@@ -171,6 +171,11 @@ def test_rep():
     publisher.__repr__()
 
 
+def test_str():
+    publisher = HttpPublisher(url="both")
+    str(publisher)
+
+
 def test_publish_success_if_success_url_is_given():
     publisher = HttpPublisher(success_url="success", failure_url="failure")
 

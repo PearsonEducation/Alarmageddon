@@ -105,6 +105,10 @@ Sends emails on test failure. The SimpleEmailPublisher will email the text of th
 Changelog
 =========
 
+1.0.5
+* Added Microsoft Teams publisher (thanks jestin1005!)
+* Pinned pytest to 2.4.0
+
 1.0.4
 * Added environment information to published messages.
 * Fixed JSON validation bug where 0 could never be matched.
