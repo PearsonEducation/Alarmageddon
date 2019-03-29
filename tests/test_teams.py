@@ -25,12 +25,6 @@ def test_requires_hook_url():
                          environment="UnitTest")
 
 
-def test_requires_environment():
-    with pytest.raises(ValueError):
-        TeamsPublisher(hook_url="fakeurl",
-                         environment="")
-
-
 def test_repr():
     teams = new_publisher()
     teams.__repr__()
