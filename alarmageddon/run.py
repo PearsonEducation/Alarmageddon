@@ -196,11 +196,11 @@ def do_dry_run(validations, publishers):
     for publisher in sorted(
             publishers, reverse=True,
             key=lambda x: x.priority_threshold):
-        print("Publisher: %s (threshold: %s)" % (
-            publisher.name(), Priority.string(publisher.priority_threshold)))
+        print(("Publisher: %s (threshold: %s)" % (
+            publisher.name(), Priority.string(publisher.priority_threshold))))
         for validation in dry_run[publisher]:
-            print("   %s (priority: %s)" % (
-                validation.name, Priority.string(validation.priority)))
+            print(("   %s (priority: %s)" % (
+                validation.name, Priority.string(validation.priority))))
 
 
 def _compute_dry_run(validations, publishers):
