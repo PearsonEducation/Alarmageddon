@@ -77,7 +77,7 @@ class ExpectedHeader(ResponseExpectation):
         if self.name not in response.headers:
             validation.fail("No header named: '{0}'.  Found header names: {1}"
                             .format(self.name,
-                                    ', '.join(response.headers.keys())))
+                                    ', '.join(list(response.headers.keys()))))
         elif self.value != response.headers[self.name]:
             validation.fail(
                 "The value of the '{0}' header is '{1}', expected '{2}'"

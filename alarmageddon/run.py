@@ -192,7 +192,7 @@ def do_dry_run(validations, publishers):
 
     """
     dry_run = _compute_dry_run(validations, publishers)
-    publishers = dry_run.keys()
+    publishers = list(dry_run.keys())
     for publisher in sorted(
             publishers, reverse=True,
             key=lambda x: x.priority_threshold):

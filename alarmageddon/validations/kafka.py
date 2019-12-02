@@ -72,7 +72,7 @@ class KafkaStatusValidation(SshValidation):
         leaders = [parsed[i] for i in range(2, len(parsed), 5)]
 
         tuples = list(zip(topics, leaders))
-        duplicates = [x for x, y in Counter(tuples).items() if y > 1]
+        duplicates = [x for x, y in list(Counter(tuples).items()) if y > 1]
 
         if len(duplicates) != 0:
             duplicates_str =", ".join("%s has %s" %

@@ -96,7 +96,7 @@ class HipChatPublisher(Publisher):
             return
         message = "{0} failure(s) in {1}:\n".format(errors, self.environment)
         message += "\n".join(_get_collapsed_message(collapsed_result)
-                             for collapsed_result in collapsed.itervalues())
+                             for collapsed_result in list(collapsed.values()))
         self._send_to_hipchat(message)
 
     def _send_to_hipchat(self, message):

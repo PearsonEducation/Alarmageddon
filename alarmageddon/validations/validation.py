@@ -160,7 +160,7 @@ class Validation(object):
         if namespace in enriched:
             raise EnrichmentFailure(publisher, self, values)
         enriched[namespace] = {}
-        for key, value in values.iteritems():
+        for key, value in list(values.items()):
             if force_namespace:
                 enriched[namespace][key] = value
             else:
