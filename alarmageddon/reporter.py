@@ -1,6 +1,6 @@
 """Reports test results to registered publishers."""
 
-from publishing.exceptions import PublishFailure
+from .publishing.exceptions import PublishFailure
 import logging
 
 logger = logging.getLogger(__name__)

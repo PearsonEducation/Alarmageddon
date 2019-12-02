@@ -1,6 +1,6 @@
 """Classes used by all kinds of Validations."""
 
-from exceptions import EnrichmentFailure, ValidationFailure
+from .exceptions import EnrichmentFailure, ValidationFailure
 GLOBAL_NAMESPACE = "GLOBAL"
 
 
