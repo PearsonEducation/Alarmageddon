@@ -29,7 +29,7 @@ def criticals(request):
     return request.param
 
 
-@pytest.fixture(params=range(5))
+@pytest.fixture(params=list(range(5)))
 def failures(request):
     return request.param
 
@@ -130,10 +130,10 @@ def test_two_enrichments_correctness_independent_of_force(bools):
     valid.enrich(page, page_values, force_namespace=bools)
     pub_data = valid.get_enriched(pub)
     page_data = valid.get_enriched(page)
-    for item in pub_values.items():
-        assert item in pub_data.items()
-    for item in page_values.items():
-        assert item in page_data.items()
+    for item in list(pub_values.items()):
+        assert item in list(pub_data.items())
+    for item in list(page_values.items()):
+        assert item in list(page_data.items())
 
 
 def test_two_enrichments_correctness_independent_of_force_reverse(bools):
@@ -146,10 +146,10 @@ def test_two_enrichments_correctness_independent_of_force_reverse(bools):
     valid.enrich(pub, pub_values, force_namespace=bools)
     pub_data = valid.get_enriched(pub)
     page_data = valid.get_enriched(page)
-    for item in pub_values.items():
-        assert item in pub_data.items()
-    for item in page_values.items():
-        assert item in page_data.items()
+    for item in list(pub_values.items()):
+        assert item in list(pub_data.items())
+    for item in list(page_values.items()):
+        assert item in list(page_data.items())
 
 
 def test_get_empty_enrichment():

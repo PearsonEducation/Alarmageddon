@@ -52,12 +52,12 @@ def test_config_gets_nested_value(conf):
 
 def test_config_returns_keys(conf):
     c = Config(conf, "prod")
-    assert c.keys() == conf.keys()
+    assert list(c.keys()) == list(conf.keys())
 
 
 def test_config_returns_values(conf):
     c = Config(conf, "prod")
-    assert c.values() == conf.values()
+    assert list(c.values()) == list(conf.values())
 
 
 def test_config_correct_environment(conf):

@@ -672,7 +672,7 @@ def test_send(tmpdir, smtpserver, httpserver):
     result = Failure("Check Status Route", http_validator,
                      description=failure_message)
     email_pub.send(result)
-    print(smtpserver.outbox[0])
+    print((smtpserver.outbox[0]))
     assert len(smtpserver.outbox) == 1
     payload = str(smtpserver.outbox[0].get_payload()[0])
     assert payload.split('\n')[5] == "Validation Failure in environment test:"
