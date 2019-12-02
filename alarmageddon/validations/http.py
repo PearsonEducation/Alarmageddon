@@ -148,7 +148,7 @@ class HttpValidation(Validation):
 
     def perform(self, group_failures):
         """Perform the HTTP request and validate the response."""
-        for i in xrange(self._retries):
+        for i in range(self._retries):
             logger.debug("Attempt {} for {} {}".format(i, self._method, self._url))
             try:
                 resp = requests.request(

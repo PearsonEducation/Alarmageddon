@@ -132,7 +132,7 @@ class Status(object):
     """An enum-like object that represents the status of a Cassandra Node
 
     """
-    UNKNOWN, UP, DOWN = range(3)
+    UNKNOWN, UP, DOWN = list(range(3))
 
     @staticmethod
     def from_text(text):
@@ -158,7 +158,7 @@ class State(object):
     """An enum-like object that represents the state of a Cassandra Node
 
     """
-    UNKNOWN, NORMAL, LEAVING, JOINING, MOVING = range(5)
+    UNKNOWN, NORMAL, LEAVING, JOINING, MOVING = list(range(5))
 
     @staticmethod
     def from_text(text):

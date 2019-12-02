@@ -91,7 +91,7 @@ class SshValidation(Validation):
                           user=self.context.user,
                           key_filename=self.context.key_file):
                 try:
-                    for i in xrange(self.retries + 1):
+                    for i in range(self.retries + 1):
                         try:
                             self.perform_on_host(host)
                             break

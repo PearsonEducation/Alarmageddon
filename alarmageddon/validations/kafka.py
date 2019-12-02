@@ -68,8 +68,8 @@ class KafkaStatusValidation(SshValidation):
                                                              host),
                                              output))
         parsed = re.split(r'\t|\n', output)
-        topics = [parsed[i] for i in xrange(0, len(parsed), 5)]
-        leaders = [parsed[i] for i in xrange(2, len(parsed), 5)]
+        topics = [parsed[i] for i in range(0, len(parsed), 5)]
+        leaders = [parsed[i] for i in range(2, len(parsed), 5)]
 
         tuples = zip(topics, leaders)
         duplicates = [x for x, y in Counter(tuples).items() if y > 1]

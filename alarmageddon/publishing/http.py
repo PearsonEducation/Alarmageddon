@@ -139,7 +139,7 @@ class HttpPublisher(Publisher):
         """
         if result.is_failure() or self._publish_successes:
             published = False
-            for i in xrange(self._attempts):
+            for i in range(self._attempts):
                 try:
                     response = requests.request(self._get_method(result),
                                                 self._get_url(result),

@@ -125,7 +125,7 @@ def _run_validations(validations, reporter, processes=1, timeout=60, timeout_ret
         immutable_group_failures = dict(group_failures)
         results = manager.list()
         for valid in order_set:
-            for i in xrange(timeout_retries):
+            for i in range(timeout_retries):
                 #TODO: parallelize
                 p = multiprocessing.Process(target=_perform, args=(valid, immutable_group_failures, results))
                 p.start()

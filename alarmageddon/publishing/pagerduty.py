@@ -113,7 +113,7 @@ class PagerDutyPublisher(Publisher):
 
             #exponential backoff
             logger.debug("Sending send {}".format(result))
-            for i in xrange(4):
+            for i in range(4):
                 resp = requests.post(self._api_end_point,
                                      data=data, headers=headers, stream=True)
 
