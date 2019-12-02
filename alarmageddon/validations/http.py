@@ -1,9 +1,9 @@
 """HTTP Validation"""
 import time
-import urlparse
 import os
 import requests
 import copy
+import six.moves.urllib.parse as urlparse
 
 from alarmageddon.validations.validation import Validation, Priority
 from alarmageddon.validations.json_expectations import \
