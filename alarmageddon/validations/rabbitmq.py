@@ -72,7 +72,7 @@ class RabbitMqValidation(Validation):
         """
         try:
             (conn, chan) = self._connect()
-        except AMQPError, ex:
+        except AMQPError as ex:
             #if we're here we're intentionally ignoring the failure
             return
 
@@ -84,7 +84,7 @@ class RabbitMqValidation(Validation):
                 self.fail("Too many messages in queue ({0} messages)."
                           .format(message_count))
 
-        except AMQPError, ex:
+        except AMQPError as ex:
             self.fail("RabbitMQ exception throw from host: {0}.  {1}"
                       .format(self.rabbitmq_context.host, repr(ex)))
 
@@ -99,7 +99,7 @@ class RabbitMqValidation(Validation):
                 conn = self.rabbitmq_context.get_connection(self.timeout)
                 chan = conn.channel()
                 return (conn, chan)
-            except AMQPError, ex:
+            except AMQPError as ex:
                 if attempt >= self.num_attempts:
                     if self.ignore_connection_failure:
                         raise ex

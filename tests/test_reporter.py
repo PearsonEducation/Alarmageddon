@@ -82,5 +82,5 @@ def test_reporter_shows_publish_error_info(env):
     reporter.collect(Success("success", Validation("valid")))
     try:
         reporter.report()
-    except ReportingFailure,e:
+    except ReportingFailure as e:
         assert "NOT_HIDDEN" in str(e) 

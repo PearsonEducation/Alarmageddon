@@ -171,7 +171,7 @@ def _perform(validation, immutable_group_failures, results):
         else:
             result = Success(validation.name, validation,
                              time=runtime)
-    except Exception, e:
+    except Exception as e:
         result = Failure(validation.name, validation, str(e),
                          time=time.time() - start)
 

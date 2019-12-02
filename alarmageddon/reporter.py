@@ -48,7 +48,7 @@ class Reporter(object):
             logger.debug("Reporting to {}".format(publisher))
             try:
                 publisher.send_batch(self._reports)
-            except PublishFailure,e:
+            except PublishFailure as e:
                 #we don't want to block other publishers from publishing
                 #so just keep going for now
                 errors.append(e)

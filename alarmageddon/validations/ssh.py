@@ -95,12 +95,12 @@ class SshValidation(Validation):
                         try:
                             self.perform_on_host(host)
                             break
-                        except CommandTimeout, ex:
+                        except CommandTimeout as ex:
                             #we connected, so don't retry
                             self.fail_on_host(
                                 host,
                                 "SSH Command timed out: {0}".format(str(ex)))
-                        except Exception, ex:
+                        except Exception as ex:
                             if i >= self.retries:
                                 self.fail_on_host(
                                     host,

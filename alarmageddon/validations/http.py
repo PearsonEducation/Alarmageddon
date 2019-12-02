@@ -159,7 +159,7 @@ class HttpValidation(Validation):
                 self._elapsed_time = resp.elapsed.total_seconds()
                 self._check_expectations(resp)
                 break
-            except Exception, ex:
+            except Exception as ex:
                 if type(ex) is requests.exceptions.Timeout:
                     self._elapsed_time = self.timeout
                 if i == self._retries - 1:

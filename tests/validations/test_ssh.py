@@ -89,7 +89,7 @@ def test_max_load_correctly_formats_failure(monkeypatch, tmpdir):
 
         #we should have raised an error
         assert False
-    except ValidationFailure, e:
+    except ValidationFailure as e:
         #this is a weak check
         assert "{0}" not in str(e)
 
