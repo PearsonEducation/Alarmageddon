@@ -73,7 +73,7 @@ class PagerDutyPublisher(Publisher):
         #and here
         message = str(type(validation)) + str(validation.__dict__)
         hasher = hashlib.md5()
-        hasher.update(message)
+        hasher.update(message.encode('utf-8'))
         pagerduty_id = hasher.hexdigest()
 
         logger.debug("Generated id {} for {}".format(pagerduty_id, result))

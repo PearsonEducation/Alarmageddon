@@ -9,9 +9,11 @@ from jinja2 import Template, Environment, FileSystemLoader, Undefined
 
 import smtplib
 
-from email.MIMEMultipart import MIMEMultipart
-from email.MIMEText import MIMEText
-from email import Utils
+#from email.MIMEMultipart import MIMEMultipart
+#from email.MIMEText import MIMEText
+from six.moves.email_mime_text import MIMEText
+from six.moves.email_mime_multipart import MIMEMultipart
+from email import utils
 
 import logging
 
@@ -196,7 +198,7 @@ class SimpleEmailPublisher(Publisher):
         :param sender: A dictionary containing information about the sender.
 
         """
-        return Utils.formataddr((sender['real_name'], sender['address']))
+        return utils.formataddr((sender['real_name'], sender['address']))
 
     def configure_recipients(self, recipients):
         """Properly formats the list of recipient addresses.
@@ -211,7 +213,7 @@ class SimpleEmailPublisher(Publisher):
         addresses = []
 
         for recipient in recipients:
-            addresses.append(Utils.formataddr((recipient['real_name'],
+            addresses.append(utils.formataddr((recipient['real_name'],
                                                recipient['address'])))
 
         # sendmail requires the recipients to be an array of addresses
