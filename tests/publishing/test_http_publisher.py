@@ -29,7 +29,7 @@ def good_app(environ, start_response):
     response_headers = [('Content-type', 'text/plain')]
     start_response(status, response_headers)
 
-    return ["Success"]
+    return ["Success".encode('utf-8')]
 
 
 @pytest.fixture()
@@ -65,13 +65,13 @@ def failing_app(environ, start_response):
         status = '200 OK'
         response_headers = [('Content-type', 'text/plain')]
         start_response(status, response_headers)
-        return ["Success"]
+        return ["Success".encode('utf-8')]
     else:
         times_to_fail = times_to_fail - 1
         status = '500 Internal Server Error'
         response_headers = [('Content-type', 'text/plain')]
         start_response(status, response_headers)
-        return ["Failure"]
+        return ["Failure".encode('utf-8')]
 
 
 @pytest.fixture()
@@ -106,7 +106,7 @@ def slow_app(environ, start_response):
     response_headers = [('Content-type', 'text/plain')]
     time.sleep(sleep_time)
     start_response(status, response_headers)
-    return ["Success"]
+    return ["Success".encode('utf-8')]
 
 
 @pytest.fixture()

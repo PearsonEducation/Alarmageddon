@@ -25,7 +25,7 @@ def rate_limiting_app(environ, start_response):
         hits += 1
     response_headers = [('Content-type', 'text/plain')]
     start_response(status, response_headers)
-    return ["Slow down?!\n"]
+    return ["Slow down?!\n".encode('utf-8')]
 
 
 @pytest.fixture()

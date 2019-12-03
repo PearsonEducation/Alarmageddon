@@ -11,6 +11,7 @@ import json
 import pytest
 import socket
 import smtplib
+import six
 
 def test_simple_email_repr(smtpserver):
     email_pub = SimpleEmailPublisher({"real_name": "test", "address": "test@test.com"},
@@ -169,7 +170,8 @@ def test_configure_message_single_recipient(tmpdir, smtpserver):
     assert msg['Subject'] == "Test Subject"
     assert msg['From'] == "Alarmageddon Monitor <noreply@alarmageddon.com>"
     assert msg['To'] == "Test Recipient <testrecipient@alarmageddon.com>"
-    assert str(msg.get_payload()[0]).split('\n')[5] == "Test Body"
+    offset = int(six.PY2)
+    assert str(msg.get_payload()[0]).split('\n')[4+offset] == "Test Body"
 
 
 def test_configure_message_multiple_recipients(tmpdir, smtpserver):
@@ -188,7 +190,8 @@ def test_configure_message_multiple_recipients(tmpdir, smtpserver):
     assert msg['To'] == \
         "Test Recipient Override 1 <testrecipientoverride1@alarmageddon.com>,"\
         " Test Recipient Override 2 <testrecipientoverride2@alarmageddon.com>"
-    assert str(msg.get_payload()[0]).split('\n')[5] == "Test Body"
+    offset = int(six.PY2)
+    assert str(msg.get_payload()[0]).split('\n')[4+offset] == "Test Body"
 
 
 def test_configure_smtp_object(tmpdir, smtpserver, monkeypatch):
@@ -672,16 +675,18 @@ def test_send(tmpdir, smtpserver, httpserver):
     result = Failure("Check Status Route", http_validator,
                      description=failure_message)
     email_pub.send(result)
-    print((smtpserver.outbox[0]))
     assert len(smtpserver.outbox) == 1
     payload = str(smtpserver.outbox[0].get_payload()[0])
-    assert payload.split('\n')[5] == "Validation Failure in environment test:"
-    assert payload.split('\n')[6] == "Test Name: [Check Status Route]"
-    assert payload.split('\n')[7] == \
+
+    # Python2 includes the "from" line
+    offset = int(six.PY2)
+    assert payload.split('\n')[4+offset] == "Validation Failure in environment test:"
+    assert payload.split('\n')[5+offset] == "Test Name: [Check Status Route]"
+    assert payload.split('\n')[6+offset] == \
         "Test Description: [Validation failure. Expected 200, received 404.]"
     custom_message = "Custom Message: [Validation failed in environment " \
                      "test: Check Status Route.]"
-    assert payload.split('\n')[8] == custom_message
+    assert payload.split('\n')[7+offset] == custom_message
 
 
 def mock_smtp_init(self, host='', port=0, local_hostname=None,

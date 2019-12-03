@@ -6,26 +6,8 @@ from alarmageddon.publishing import pagerduty
 from alarmageddon.validations.exceptions import EnrichmentFailure
 
 
-thresholds = [0, 3, 5]
-
-
 @pytest.fixture(params=[True, False])
 def bools(request):
-    return request.param
-
-
-@pytest.fixture(params=thresholds)
-def lows(request):
-    return request.param
-
-
-@pytest.fixture(params=thresholds)
-def normals(request):
-    return request.param
-
-
-@pytest.fixture(params=thresholds)
-def criticals(request):
     return request.param
 
 
@@ -57,13 +39,15 @@ def test_repr():
     v.__repr__()
 
 
-def test_group_validation_correct_thresholds(lows, normals, criticals):
+def test_group_validation_correct_thresholds():
+    lows, normals, criticals = [0, 3, 5]
     v = GroupValidation("name", "group", low_threshold=lows,
                         normal_threshold=normals, critical_threshold=criticals)
     assert v.low_threshold <= v.normal_threshold <= v.critical_threshold
 
 
 def test_group_validation_handles_failures_correctly(failures, failure_lows):
+    lows, normals, criticals = [0, 3, 5]
     v = GroupValidation("name", "group", low_threshold=failure_lows,
                         normal_threshold=2, critical_threshold=3)
     v._set_priority(failures)
