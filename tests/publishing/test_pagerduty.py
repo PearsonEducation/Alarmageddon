@@ -28,7 +28,8 @@ def rate_limiting_app(environ, start_response):
     return ["Slow down?!\n"]
 
 
-def pytest_funcarg__ratelimited(request):
+@pytest.fixture()
+def ratelimited(request):
     """Defines the testserver funcarg"""
     server = WSGIServer(application=rate_limiting_app)
     server.start()

@@ -16,8 +16,8 @@ def slow_app(environ, start_response):
     return ["Slow?!\n"]
 
 
-def pytest_funcarg__slowserver(request):
-    """Defines the testserver funcarg"""
+@pytest.fixture()
+def slowserver(request):
     server = WSGIServer(application=slow_app)
     server.start()
     request.addfinalizer(server.stop)

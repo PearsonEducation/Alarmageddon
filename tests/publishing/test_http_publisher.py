@@ -32,7 +32,8 @@ def good_app(environ, start_response):
     return ["Success"]
 
 
-def pytest_funcarg__goodserver(request):
+@pytest.fixture()
+def goodserver(request):
     """Defines the testserver funcarg"""
     global request_sent
     request_sent = False
@@ -73,7 +74,8 @@ def failing_app(environ, start_response):
         return ["Failure"]
 
 
-def pytest_funcarg__failingserver(request):
+@pytest.fixture()
+def failingserver(request):
     """Defines the testserver funcarg"""
     global request_sent
     request_sent = False
@@ -107,8 +109,8 @@ def slow_app(environ, start_response):
     return ["Success"]
 
 
-def pytest_funcarg__slowserver(request):
-    """Defines the testserver funcarg"""
+@pytest.fixture()
+def slowserver(request):
     global request_sent
     request_sent = False
 
