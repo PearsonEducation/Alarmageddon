@@ -24,6 +24,6 @@ setup(
                             "pycrypto==2.6.1",
                             "six==1.13.0",
                             "pika==0.9.13",
-                            "pytest==2.4.0",
-                            "pytest-localserver==0.3.2"],
+                            "pytest==4.6.6",
+                            "pytest-localserver==0.5.0"],
     )
