@@ -1,7 +1,5 @@
 """Convenience Validations for working with Cassandra"""
 
-from fabric.operations import run
-
 from alarmageddon.validations.validation import Priority
 from alarmageddon.validations.ssh import SshValidation
 
@@ -393,9 +391,10 @@ class CassandraStatusValidation(SshValidation):
         self.owns_threshold = owns_threshold
         self.cluster_name = cluster_name
 
-    def perform_on_host(self, host):
+    def perform_on_host(self, connection):
         """Runs nodetool status and parses the output."""
-        output = run('nodetool status')
+        output = connection.run('nodetool status')
+        host = connection.host
 
         if "Exception" in output:
             self.fail_on_host(host, ("An exception occurred while " +

@@ -4,6 +4,7 @@ import pytest
 import _pytest
 import os
 from validation_mocks import get_mock_key_file, get_mock_ssh_text
+from fabric import Connection
 
 hosts = ["a fake host"]
 
@@ -12,8 +13,8 @@ hosts = ["a fake host"]
 #a fabric command that we're overwriting
 def test_ssh_works(monkeypatch, tmpdir):
     t = "18:01:46 up 62 days, 18:27,  1 user,  load average: 0.09, 0.04, 0.05"
-    monkeypatch.setattr(ssh, "run",
-                        lambda x, combine_stderr, timeout: get_mock_ssh_text(t, 0))
+    monkeypatch.setattr(Connection, "run",
+                        lambda self, x, combine_stderr, timeout: get_mock_ssh_text(t, 0))
     ssh_ctx = ssh.SshContext("ubuntu", get_mock_key_file(tmpdir))
 
     (ssh.SshCommandValidation(ssh_ctx, "name", "cmd", hosts=hosts)
@@ -22,8 +23,8 @@ def test_ssh_works(monkeypatch, tmpdir):
 
 def test_ssh_expected_0_by_default(monkeypatch, tmpdir):
     t = "18:01:46 up 62 days, 18:27,  1 user,  load average: 0.09, 0.04, 0.05"
-    monkeypatch.setattr(ssh, "run",
-                        lambda x, combine_stderr, timeout: get_mock_ssh_text(t, 1))
+    monkeypatch.setattr(Connection, "run",
+                        lambda self, x, combine_stderr, timeout: get_mock_ssh_text(t, 1))
     ssh_ctx = ssh.SshContext("ubuntu", get_mock_key_file(tmpdir))
 
     with pytest.raises(ValidationFailure):
@@ -33,8 +34,8 @@ def test_ssh_expected_0_by_default(monkeypatch, tmpdir):
 
 def test_ssh_expected_return_code(monkeypatch, tmpdir):
     t = "18:01:46 up 62 days, 18:27,  1 user,  load average: 0.09, 0.04, 0.05"
-    monkeypatch.setattr(ssh, "run",
-                        lambda x, combine_stderr, timeout: get_mock_ssh_text(t, 1))
+    monkeypatch.setattr(Connection, "run",
+                        lambda self, x, combine_stderr, timeout: get_mock_ssh_text(t, 1))
     ssh_ctx = ssh.SshContext("ubuntu", get_mock_key_file(tmpdir))
 
     (ssh.SshCommandValidation(ssh_ctx, "name", "cmd", hosts=hosts)
@@ -44,8 +45,8 @@ def test_ssh_expected_return_code(monkeypatch, tmpdir):
 
 def test_ssh_expected_rejects_0_when_changed(monkeypatch, tmpdir):
     t = "18:01:46 up 62 days, 18:27,  1 user,  load average: 0.09, 0.04, 0.05"
-    monkeypatch.setattr(ssh, "run",
-                        lambda x, combine_stderr, timeout: get_mock_ssh_text(t, 0))
+    monkeypatch.setattr(Connection, "run",
+                        lambda self, x, combine_stderr, timeout: get_mock_ssh_text(t, 0))
     ssh_ctx = ssh.SshContext("ubuntu", get_mock_key_file(tmpdir))
 
     with pytest.raises(ValidationFailure):
@@ -56,8 +57,8 @@ def test_ssh_expected_rejects_0_when_changed(monkeypatch, tmpdir):
 
 def test_load_average_disallows_generic_expections(monkeypatch, tmpdir):
     t = "18:01:46 up 62 days, 18:27,  1 user,  load average: 0.09, 0.04, 0.05"
-    monkeypatch.setattr(ssh, "run",
-                        lambda x, combine_stderr, timeout: get_mock_ssh_text(t, 0))
+    monkeypatch.setattr(Connection, "run",
+                        lambda self, x, combine_stderr, timeout: get_mock_ssh_text(t, 0))
     ssh_ctx = ssh.SshContext("ubuntu", get_mock_key_file(tmpdir))
 
     with pytest.raises(NotImplementedError):
@@ -68,7 +69,7 @@ def test_load_average_disallows_generic_expections(monkeypatch, tmpdir):
 
 def test_max_load_average(monkeypatch, tmpdir):
     t = "18:01:46 up 62 days, 18:27,  1 user,  load average: 0.09, 0.04, 0.05"
-    monkeypatch.setattr(ssh, "run", lambda x: get_mock_ssh_text(t, 0))
+    monkeypatch.setattr(Connection, "run", lambda self, x: get_mock_ssh_text(t, 0))
     ssh_ctx = ssh.SshContext("ubuntu", get_mock_key_file(tmpdir))
 
     (ssh.LoadAverageValidation(ssh_ctx, hosts=hosts)
@@ -80,7 +81,7 @@ def test_max_load_average(monkeypatch, tmpdir):
 
 def test_max_load_correctly_formats_failure(monkeypatch, tmpdir):
     t = "18:01:46 up 62 days, 18:27,  1 user,  load average: 40.09, 0.04, 0.05"
-    monkeypatch.setattr(ssh, "run", lambda x: get_mock_ssh_text(t, 0))
+    monkeypatch.setattr(Connection, "run", lambda self, x: get_mock_ssh_text(t, 0))
     ssh_ctx = ssh.SshContext("ubuntu", get_mock_key_file(tmpdir))
     try:
         (ssh.LoadAverageValidation(ssh_ctx, hosts=hosts)
@@ -95,7 +96,7 @@ def test_max_load_correctly_formats_failure(monkeypatch, tmpdir):
 
 def test_max_load_correctly_fails_1_minute(monkeypatch, tmpdir):
     t = "18:01:46 up 62 days, 18:27,  1 user,  load average: 40.09, 0.04, 0.05"
-    monkeypatch.setattr(ssh, "run", lambda x: get_mock_ssh_text(t, 0))
+    monkeypatch.setattr(Connection, "run", lambda self, x: get_mock_ssh_text(t, 0))
     ssh_ctx = ssh.SshContext("ubuntu", get_mock_key_file(tmpdir))
     with pytest.raises(ValidationFailure):
         (ssh.LoadAverageValidation(ssh_ctx, hosts=hosts)
@@ -105,7 +106,7 @@ def test_max_load_correctly_fails_1_minute(monkeypatch, tmpdir):
 
 def test_max_load_correctly_fails_5_minute(monkeypatch, tmpdir):
     t = "18:01:46 up 62 days, 18:27,  1 user,  load average: 0.09, 30.04, 0.05"
-    monkeypatch.setattr(ssh, "run", lambda x: get_mock_ssh_text(t, 0))
+    monkeypatch.setattr(Connection, "run", lambda self, x: get_mock_ssh_text(t, 0))
     ssh_ctx = ssh.SshContext("ubuntu", get_mock_key_file(tmpdir))
     with pytest.raises(ValidationFailure):
         (ssh.LoadAverageValidation(ssh_ctx, hosts=hosts)
@@ -115,7 +116,7 @@ def test_max_load_correctly_fails_5_minute(monkeypatch, tmpdir):
 
 def test_max_load_correctly_fails_15_minute(monkeypatch, tmpdir):
     t = "18:01:46 up 62 days, 18:27,  1 user,  load average: 0.09, 0.04, 12.05"
-    monkeypatch.setattr(ssh, "run", lambda x: get_mock_ssh_text(t, 0))
+    monkeypatch.setattr(Connection, "run", lambda self, x: get_mock_ssh_text(t, 0))
     ssh_ctx = ssh.SshContext("ubuntu", get_mock_key_file(tmpdir))
     with pytest.raises(ValidationFailure):
         (ssh.LoadAverageValidation(ssh_ctx, hosts=hosts)
@@ -125,7 +126,7 @@ def test_max_load_correctly_fails_15_minute(monkeypatch, tmpdir):
 
 def test_min_load_average(monkeypatch, tmpdir):
     t = "18:01:46 up 62 days, 18:27,  1 user,  load average: 9.09, 2.04, 10.05"
-    monkeypatch.setattr(ssh, "run", lambda x: get_mock_ssh_text(t, 0))
+    monkeypatch.setattr(Connection, "run", lambda self, x: get_mock_ssh_text(t, 0))
     ssh_ctx = ssh.SshContext("ubuntu", get_mock_key_file(tmpdir))
 
     (ssh.LoadAverageValidation(ssh_ctx, hosts=hosts)
@@ -137,7 +138,7 @@ def test_min_load_average(monkeypatch, tmpdir):
 
 def test_min_load_correctly_fails_1_minute(monkeypatch, tmpdir):
     t = "18:01:46 up 62 days, 18:27,  1 user,  load average: 0.01, 0.04, 0.05"
-    monkeypatch.setattr(ssh, "run", lambda x: get_mock_ssh_text(t, 0))
+    monkeypatch.setattr(Connection, "run", lambda self, x: get_mock_ssh_text(t, 0))
     ssh_ctx = ssh.SshContext("ubuntu", get_mock_key_file(tmpdir))
     with pytest.raises(ValidationFailure):
         (ssh.LoadAverageValidation(ssh_ctx, hosts=hosts)
@@ -147,7 +148,7 @@ def test_min_load_correctly_fails_1_minute(monkeypatch, tmpdir):
 
 def test_min_load_correctly_fails_5_minute(monkeypatch, tmpdir):
     t = "18:01:46 up 62 days, 18:27,  1 user,  load average: 0.09, 0.04, 0.05"
-    monkeypatch.setattr(ssh, "run", lambda x: get_mock_ssh_text(t, 0))
+    monkeypatch.setattr(Connection, "run", lambda self, x: get_mock_ssh_text(t, 0))
     ssh_ctx = ssh.SshContext("ubuntu", get_mock_key_file(tmpdir))
     with pytest.raises(ValidationFailure):
         (ssh.LoadAverageValidation(ssh_ctx, hosts=hosts)
@@ -157,7 +158,7 @@ def test_min_load_correctly_fails_5_minute(monkeypatch, tmpdir):
 
 def test_min_load_correctly_fails_15_minute(monkeypatch, tmpdir):
     t = "18:01:46 up 62 days, 18:27,  1 user,  load average: 0.09, 0.04, 0.01"
-    monkeypatch.setattr(ssh, "run", lambda x: get_mock_ssh_text(t, 0))
+    monkeypatch.setattr(Connection, "run", lambda self, x: get_mock_ssh_text(t, 0))
     ssh_ctx = ssh.SshContext("ubuntu", get_mock_key_file(tmpdir))
     with pytest.raises(ValidationFailure):
         (ssh.LoadAverageValidation(ssh_ctx, hosts=hosts)
@@ -167,8 +168,8 @@ def test_min_load_correctly_fails_15_minute(monkeypatch, tmpdir):
 
 def test_service_state(monkeypatch, tmpdir):
     t = "running"
-    monkeypatch.setattr(ssh, "sudo",
-                        lambda x, combine_stderr, timeout: get_mock_ssh_text(t, 0))
+    monkeypatch.setattr(Connection, "sudo",
+                        lambda self, x, combine_stderr, timeout: get_mock_ssh_text(t, 0))
     ssh_ctx = ssh.SshContext("ubuntu", get_mock_key_file(tmpdir))
 
     (ssh.UpstartServiceValidation(ssh_ctx, "citations", hosts=hosts)
@@ -177,8 +178,8 @@ def test_service_state(monkeypatch, tmpdir):
 
 def test_exit_code_equals(monkeypatch, tmpdir):
     t = "stopped/waiting"
-    monkeypatch.setattr(ssh, "run",
-                        lambda x, combine_stderr, timeout: get_mock_ssh_text(t, 0))
+    monkeypatch.setattr(Connection, "run",
+                        lambda self, x, combine_stderr, timeout: get_mock_ssh_text(t, 0))
     ssh_ctx = ssh.SshContext("ubuntu", get_mock_key_file(tmpdir))
 
     (ssh.SshCommandValidation(ssh_ctx, "citations", "command", hosts=hosts)
@@ -188,8 +189,8 @@ def test_exit_code_equals(monkeypatch, tmpdir):
 
 def test_exit_code_not_equals(monkeypatch, tmpdir):
     t = "stopped/waiting"
-    monkeypatch.setattr(ssh, "run",
-                        lambda x, combine_stderr, timeout: get_mock_ssh_text(t, 0))
+    monkeypatch.setattr(Connection, "run",
+                        lambda self, x, combine_stderr, timeout: get_mock_ssh_text(t, 0))
     ssh_ctx = ssh.SshContext("ubuntu", get_mock_key_file(tmpdir))
 
     with pytest.raises(ValidationFailure):
@@ -200,8 +201,8 @@ def test_exit_code_not_equals(monkeypatch, tmpdir):
 
 def test_output_contains(monkeypatch, tmpdir):
     t = "stopped/waiting"
-    monkeypatch.setattr(ssh, "run",
-                        lambda x, combine_stderr, timeout: get_mock_ssh_text(t, 0))
+    monkeypatch.setattr(Connection, "run",
+                        lambda self, x, combine_stderr, timeout: get_mock_ssh_text(t, 0))
     ssh_ctx = ssh.SshContext("ubuntu", get_mock_key_file(tmpdir))
 
     (ssh.SshCommandValidation(ssh_ctx, "citations", "command", hosts=hosts)
@@ -211,8 +212,8 @@ def test_output_contains(monkeypatch, tmpdir):
 
 def test_output_contains_correctly_fails(monkeypatch, tmpdir):
     t = "stopped/waiting"
-    monkeypatch.setattr(ssh, "run",
-                        lambda x, combine_stderr, timeout: get_mock_ssh_text(t, 0))
+    monkeypatch.setattr(Connection, "run",
+                        lambda self, x, combine_stderr, timeout: get_mock_ssh_text(t, 0))
     ssh_ctx = ssh.SshContext("ubuntu", get_mock_key_file(tmpdir))
 
     with pytest.raises(ValidationFailure):
@@ -223,8 +224,8 @@ def test_output_contains_correctly_fails(monkeypatch, tmpdir):
 
 def test_output_does_not_contain(monkeypatch, tmpdir):
     t = "stopped/waiting"
-    monkeypatch.setattr(ssh, "run",
-                        lambda x, combine_stderr, timeout: get_mock_ssh_text(t, 0))
+    monkeypatch.setattr(Connection, "run",
+                        lambda self, x, combine_stderr, timeout: get_mock_ssh_text(t, 0))
     ssh_ctx = ssh.SshContext("ubuntu", get_mock_key_file(tmpdir))
 
     (ssh.SshCommandValidation(ssh_ctx, "citations", "command", hosts=hosts)
@@ -234,8 +235,8 @@ def test_output_does_not_contain(monkeypatch, tmpdir):
 
 def test_output_does_not_contain_correctly_fails(monkeypatch, tmpdir):
     t = "stopped/waiting"
-    monkeypatch.setattr(ssh, "run",
-                        lambda x, combine_stderr, timeout: get_mock_ssh_text(t, 0))
+    monkeypatch.setattr(Connection, "run",
+                        lambda self, x, combine_stderr, timeout: get_mock_ssh_text(t, 0))
     ssh_ctx = ssh.SshContext("ubuntu", get_mock_key_file(tmpdir))
 
     with pytest.raises(ValidationFailure):
@@ -246,8 +247,8 @@ def test_output_does_not_contain_correctly_fails(monkeypatch, tmpdir):
 
 def test_output_greater_than(monkeypatch, tmpdir):
     t = "100"
-    monkeypatch.setattr(ssh, "run",
-                        lambda x, combine_stderr, timeout: get_mock_ssh_text(t, 0))
+    monkeypatch.setattr(Connection, "run",
+                        lambda self, x, combine_stderr, timeout: get_mock_ssh_text(t, 0))
     ssh_ctx = ssh.SshContext("ubuntu", get_mock_key_file(tmpdir))
 
     validation = ssh.SshCommandValidation(ssh_ctx,
@@ -260,8 +261,8 @@ def test_output_greater_than(monkeypatch, tmpdir):
 
 def test_output_greater_than_correctly_fails(monkeypatch, tmpdir):
     t = "100"
-    monkeypatch.setattr(ssh, "run",
-                        lambda x, combine_stderr, timeout: get_mock_ssh_text(t, 0))
+    monkeypatch.setattr(Connection, "run",
+                        lambda self, x, combine_stderr, timeout: get_mock_ssh_text(t, 0))
     ssh_ctx = ssh.SshContext("ubuntu", get_mock_key_file(tmpdir))
 
     with pytest.raises(ValidationFailure):
@@ -275,8 +276,8 @@ def test_output_greater_than_correctly_fails(monkeypatch, tmpdir):
 
 def test_output_less_than(monkeypatch, tmpdir):
     t = "100"
-    monkeypatch.setattr(ssh, "run",
-                        lambda x, combine_stderr, timeout: get_mock_ssh_text(t, 0))
+    monkeypatch.setattr(Connection, "run",
+                        lambda self, x, combine_stderr, timeout: get_mock_ssh_text(t, 0))
     ssh_ctx = ssh.SshContext("ubuntu", get_mock_key_file(tmpdir))
 
     validation = ssh.SshCommandValidation(ssh_ctx,
@@ -289,8 +290,8 @@ def test_output_less_than(monkeypatch, tmpdir):
 
 def test_output_less_than_correctly_fails(monkeypatch, tmpdir):
     t = "100"
-    monkeypatch.setattr(ssh, "run",
-                        lambda x, combine_stderr, timeout: get_mock_ssh_text(t, 0))
+    monkeypatch.setattr(Connection, "run",
+                        lambda self, x, combine_stderr, timeout: get_mock_ssh_text(t, 0))
     ssh_ctx = ssh.SshContext("ubuntu", get_mock_key_file(tmpdir))
 
     with pytest.raises(ValidationFailure):
@@ -307,8 +308,8 @@ def broken_ssh():
 
 
 def test_output_correct_on_ssh_failure(monkeypatch, tmpdir):
-    monkeypatch.setattr(ssh, "run",
-                        lambda x, combine_stderr, timeout: broken_ssh())
+    monkeypatch.setattr(Connection, "run",
+                        lambda self, x, combine_stderr, timeout: broken_ssh())
     ssh_ctx = ssh.SshContext("ubuntu", get_mock_key_file(tmpdir))
 
     with pytest.raises(ValidationFailure):
@@ -322,8 +323,8 @@ def test_output_correct_on_ssh_failure(monkeypatch, tmpdir):
 
 def test_repr(monkeypatch, tmpdir):
     t = "18:01:46 up 62 days, 18:27,  1 user,  load average: 0.09, 0.04, 0.05"
-    monkeypatch.setattr(ssh, "run",
-                        lambda x, combine_stderr, timeout: get_mock_ssh_text(t, 0))
+    monkeypatch.setattr(Connection, "run",
+                        lambda self, x, combine_stderr, timeout: get_mock_ssh_text(t, 0))
     ssh_ctx = ssh.SshContext("ubuntu", get_mock_key_file(tmpdir))
 
     (ssh.SshCommandValidation(ssh_ctx, "name", "cmd", hosts=hosts)
@@ -332,8 +333,8 @@ def test_repr(monkeypatch, tmpdir):
 
 def test_str(monkeypatch, tmpdir):
     t = "18:01:46 up 62 days, 18:27,  1 user,  load average: 0.09, 0.04, 0.05"
-    monkeypatch.setattr(ssh, "run",
-                        lambda x, combine_stderr, timeout: get_mock_ssh_text(t, 0))
+    monkeypatch.setattr(Connection, "run",
+                        lambda self, x, combine_stderr, timeout: get_mock_ssh_text(t, 0))
     ssh_ctx = ssh.SshContext("ubuntu", get_mock_key_file(tmpdir))
 
     str(ssh.SshCommandValidation(ssh_ctx, "name", "cmd", hosts=hosts))

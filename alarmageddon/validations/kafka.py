@@ -1,7 +1,5 @@
 """Convenience Validations for working with Kafka"""
 
-from fabric.operations import run
-
 from alarmageddon.validations.validation import Priority
 from alarmageddon.validations.ssh import SshValidation
 
@@ -51,9 +49,10 @@ class KafkaStatusValidation(SshValidation):
         self.zookeeper_nodes = zookeeper_nodes
         self.cluster_name = cluster_name
 
-    def perform_on_host(self, host):
+    def perform_on_host(self, connection):
         """Runs kafka list topic command on host"""
-        output = run(
+        host = connection.host
+        output = connection.run(
             self.kafka_list_topic_command +
             " --zookeeper " +
             self.zookeeper_nodes)
