@@ -160,7 +160,7 @@ class HttpValidation(Validation):
                 self._check_expectations(resp)
                 break
             except Exception as ex:
-                if type(ex) is requests.exceptions.Timeout:
+                if type(ex) is requests.exceptions.ReadTimeout:
                     self._elapsed_time = self.timeout
                 if i == self._retries - 1:
                     raise ex
