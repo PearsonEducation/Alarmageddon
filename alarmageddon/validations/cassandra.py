@@ -393,7 +393,7 @@ class CassandraStatusValidation(SshValidation):
 
     def perform_on_host(self, connection):
         """Runs nodetool status and parses the output."""
-        output = connection.run('nodetool status')
+        output = connection.run('nodetool status', warn=True)
         host = connection.host
 
         if "Exception" in output:

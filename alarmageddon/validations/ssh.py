@@ -5,6 +5,7 @@ We're using fabric for easy SSH command execution.
 
 """
 
+import sys
 import os
 import time
 import re
@@ -180,15 +181,15 @@ class SshCommandValidation(SshValidation):
 
         """
         if self.use_sudo:
-            output = connection.sudo(self.command,
-                                     combine_stderr=True, timeout=self.timeout)
+            output = connection.sudo(self.command, err_stream=sys.stdout,
+                                     timeout=self.timeout, warn=True)
         else:
-            output = connection.run(self.command,
-                                    combine_stderr=True, timeout=self.timeout)
+            output = connection.run(self.command, err_stream=sys.stdout,
+                                    timeout=self.timeout, warn=True)
         logger.info("Got output {} from host {}".format(output, connection.host))
         exit_code = output.return_code
         for expectation in self.expectations:
-            expectation.validate(self, connection.host, output, exit_code)
+            expectation.validate(self, connection.host, output.stdout, exit_code)
 
 
 class UpstartServiceValidation(SshCommandValidation):
@@ -426,12 +427,12 @@ class SshCommands(object):
     @staticmethod
     def get_cpu_count(connection):
         """return the number of processors on the server"""
-        return int(connection.run("grep processor /proc/cpuinfo | wc -l"))
+        return int(connection.run("grep processor /proc/cpuinfo | wc -l"), warn=True)
 
     @staticmethod
     def get_uptime(connection):
         """return the system uptime"""
-        output = connection.run("uptime")
+        output = connection.run("uptime", warn=True)
         match = UPTIME_REGEX.search(output)
         if match:
             return (float(match.group(1)),

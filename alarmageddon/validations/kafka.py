@@ -55,7 +55,7 @@ class KafkaStatusValidation(SshValidation):
         output = connection.run(
             self.kafka_list_topic_command +
             " --zookeeper " +
-            self.zookeeper_nodes)
+            self.zookeeper_nodes, warn=True)
 
         error_patterns = [
             'No such file', 'Missing required argument', 'Exception']
