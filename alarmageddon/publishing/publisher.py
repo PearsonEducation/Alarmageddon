@@ -64,6 +64,9 @@ class Publisher(object):
         :param result: The :py:class:`~.result.TestResult` of a test.
 
         """
+        if self.priority_threshold is None:
+            return True
+
         priority = result.priority
         return self.priority_threshold <= priority
 
