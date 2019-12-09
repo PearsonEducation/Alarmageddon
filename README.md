@@ -11,6 +11,8 @@ An automated service monitoring tool that reports failures to:
 
 Alarmageddon can monitor services via HTTP and/or SSH.
 
+Alarmageddon supports Python 2.7 and Python 3.4+
+
 HTML documentation can be found on [Read the Docs](http://alarmageddon.readthedocs.org/en/latest/example.html).
 
 ```python
@@ -40,6 +42,7 @@ Alarmageddon can be installed via pip:
 ```shell
 pip install alarmageddon
 ```
+
 
 Validations
 ======
@@ -104,6 +107,11 @@ Sends emails on test failure. The SimpleEmailPublisher will email the text of th
 
 Changelog
 =========
+
+1.1.0
+* Python3 support
+* Address security vulnerability by upgrading Jinja to 2.10
+* Address security vulnerability by upgrading requests to 2.22
 
 1.0.5
 * Added Microsoft Teams publisher (thanks jestin1005!)
