@@ -1,4 +1,3 @@
-from pytest_localserver.http import WSGIServer
 from alarmageddon.publishing.pagerduty import PagerDutyPublisher
 import alarmageddon.publishing.pagerduty as pagerduty
 from alarmageddon.result import Failure
@@ -7,34 +6,9 @@ from alarmageddon.publishing.exceptions import PublishFailure
 from alarmageddon.validations.validation import Validation, Priority
 import alarmageddon.validations.ssh as ssh
 import pytest
+import requests
 
-
-#sorry for the global variables, don't know how to store state in the server
-hits = 0
-cutoff = 3
-
-
-def rate_limiting_app(environ, start_response):
-    global hits
-    global cutoff
-    if hits == cutoff:
-        status = '200 OK'
-        hits = 0
-    else:
-        status = '403 FORBIDDEN'
-        hits += 1
-    response_headers = [('Content-type', 'text/plain')]
-    start_response(status, response_headers)
-    return ["Slow down?!\n".encode('utf-8')]
-
-
-@pytest.fixture()
-def ratelimited(request):
-    """Defines the testserver funcarg"""
-    server = WSGIServer(application=rate_limiting_app)
-    server.start()
-    request.addfinalizer(server.stop)
-    return server
+from mocks import MockRequestsCall
 
 
 #Successes aren't sent, so monkeypatch out post and then
@@ -109,27 +83,31 @@ def test_message_length_capped(httpserver):
     assert len(message) == pagerduty.MAX_LEN
 
 
-def test_publish_retries(ratelimited):
-    global cutoff
-    cutoff = 3
-    global hits
-    hits = 0
-    pub = PagerDutyPublisher(ratelimited.url, "token")
+def failserver_monkeypatch(monkeypatch, fail_count):
+    mock = MockRequestsCall(fail_first=fail_count)
+    monkeypatch.setattr(requests, "post", mock.post_403)
+    return mock
+
+
+def test_publish_retries(monkeypatch):
+    times_to_fail = 3
+    mock = failserver_monkeypatch(monkeypatch, times_to_fail)
+    pub = PagerDutyPublisher(mock.host, "token")
     v = Validation("low", priority=Priority.CRITICAL)
     failure = Failure("bar", v, "message")
     pub.send(failure)
+    assert mock.successes == 1
 
 
-def test_publish_stops_retrying(ratelimited):
-    global cutoff
-    cutoff = 4
-    global hits
-    hits = 0
-    pub = PagerDutyPublisher(ratelimited.url, "token")
+def test_publish_stops_retrying(monkeypatch):
+    times_to_fail = 4
+    mock = failserver_monkeypatch(monkeypatch, times_to_fail)
+    pub = PagerDutyPublisher(mock.host, "token")
     v = Validation("low", priority=Priority.CRITICAL)
     failure = Failure("bar", v, "message")
     with pytest.raises(PublishFailure):
         pub.send(failure)
+    assert mock.successes == 0
 
 
 def test_generate_id_reflexive():
@@ -166,13 +144,14 @@ def test_generate_id_different_valid_different_id():
     another = Failure("foo", v2, "to transmogrify")
     assert pub._generate_id(failure) != pub._generate_id(another)
 
+
 def ssh_key_file(tmpdir):
     tmp_file = tmpdir.join("secret.pem")
     tmp_file.write('secret')
     return tmp_file.strpath
 
-def test_generate_id_consistency_ssh(tmpdir):
 
+def test_generate_id_consistency_ssh(tmpdir):
     pub = PagerDutyPublisher("url", "token")
     ssh_ctx = ssh.SshContext("ubuntu", ssh_key_file(tmpdir))
     ssh_ctx2 = ssh.SshContext("ubuntu", ssh_key_file(tmpdir))
@@ -186,10 +165,10 @@ def test_generate_id_consistency_ssh(tmpdir):
     assert pub._generate_id(failure) == pub._generate_id(another)
 
 
-def test_environment_name_is_present(httpserver):
+def test_environment_name_is_present():
     environment = 'xanadu'
 
-    pub = PagerDutyPublisher(httpserver.url, "token",
+    pub = PagerDutyPublisher("url here", "token",
                              environment=environment)
 
     message = pub._construct_message(

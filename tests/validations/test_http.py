@@ -1,27 +1,11 @@
 "Unit Tests for HttpValidation"""
-from pytest_localserver.http import WSGIServer
 from alarmageddon.validations.http import HttpValidation
 from alarmageddon.validations.exceptions import ValidationFailure
 import pytest
-import time
 import requests
+from requests.exceptions import ReadTimeout
 import json
-
-
-def slow_app(environ, start_response):
-    status = '200 OK'
-    response_headers = [('Content-type', 'text/plain')]
-    start_response(status, response_headers)
-    time.sleep(4)
-    return ["Slow?!\n"]
-
-
-@pytest.fixture()
-def slowserver(request):
-    server = WSGIServer(application=slow_app)
-    server.start()
-    request.addfinalizer(server.stop)
-    return server
+from mocks import MockRequestsCall
 
 
 def test_repr():
@@ -230,22 +214,31 @@ def test_get_json_key_fails(httpserver):
          .perform({}))
 
 
-def test_properly_records_elapsed_time(slowserver):
-    val = HttpValidation.get(slowserver.url)
+def slowserver_monkeypatch(monkeypatch, response_time):
+    mock = MockRequestsCall(response_time=response_time)
+    monkeypatch.setattr(requests, "request", mock.request)
+    return mock
+
+
+def test_properly_records_elapsed_time(monkeypatch):
+    mock = slowserver_monkeypatch(monkeypatch, 4)
+    val = HttpValidation.get(mock.host)
     val.perform({})
     #should be ~4, but add some buffer since sleep doesn't actually
     #guarantee anything about how long it will sleep
     assert 3.8 < val._elapsed_time < 4.2
 
 
-def test_properly_times_out(slowserver):
-    val = HttpValidation.get(slowserver.url, timeout=3)
+def test_properly_times_out(monkeypatch):
+    mock = slowserver_monkeypatch(monkeypatch, 4)
+    val = HttpValidation.get(mock.host, timeout=3)
     with pytest.raises(requests.exceptions.Timeout):
         val.perform({})
 
 
-def test_properly_records_elapsed_time_on_timeout(slowserver):
-    val = HttpValidation.get(slowserver.url, timeout=3)
+def test_properly_records_elapsed_time_on_timeout(monkeypatch):
+    mock = slowserver_monkeypatch(monkeypatch, 4)
+    val = HttpValidation.get(mock.host, timeout=3)
     try:
         val.perform({})
     except requests.exceptions.Timeout:

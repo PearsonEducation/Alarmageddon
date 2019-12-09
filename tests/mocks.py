@@ -2,6 +2,53 @@ import pytest
 import alarmageddon.reporter
 from alarmageddon.validations.validation import Priority, Validation
 import time
+from requests.exceptions import ReadTimeout
+
+
+class MockRequestsCall:
+
+    class Response:
+        class Time:
+            def __init__(self, time):
+                self.time = time
+
+            def total_seconds(self):
+                return self.time
+
+        def __init__(self, code, text="", time=0):
+            self.status_code = code
+            self.text = text
+            self.elapsed = MockRequestsCall.Response.Time(time)
+
+    def __init__(self, fail_first=None, fail_after=None, response_time=0):
+        self.calls = 0
+        self.successes = 0
+        self.fail_first = fail_first
+        self.fail_after = fail_after
+        self.return_code = 200
+        self.last_url = None
+        self.host = "https://127.0.0.1"
+        self.response_time = response_time
+
+    def request(self, method, url, data, headers, auth, timeout, verify=None):
+        self.last_url = "/"
+        if "/" in url:
+            self.last_url += url.rsplit("/", 1)[1]
+        self.calls += 1
+
+        if self.fail_first is not None and self.calls <= self.fail_first:
+            raise Exception("mock failure")
+        if timeout is not None and self.response_time > timeout:
+            raise ReadTimeout()
+
+        self.successes += 1
+        return MockRequestsCall.Response(self.return_code, "", self.response_time)
+
+    def post_403(self, url, data, headers, stream):
+        try:
+            return self.request("post", url, data, headers, None, None)
+        except Exception:
+            return MockRequestsCall.Response(403)
 
 
 class MockPublisher:

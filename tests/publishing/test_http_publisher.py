@@ -5,122 +5,11 @@ from alarmageddon.publishing.exceptions import PublishFailure
 from alarmageddon.validations.validation import Validation
 from alarmageddon.validations.validation import Priority
 
-import time
+from mocks import MockRequestsCall
+
+import requests
 import pytest
 
-from pytest_localserver.http import WSGIServer
-
-global request_sent
-global requested_url
-
-#==============================================================================
-# A well-behaved, always succeeding HTTP Server
-#==============================================================================
-
-
-def good_app(environ, start_response):
-    global request_sent
-    request_sent = True
-
-    global requested_url
-    requested_url = environ['PATH_INFO']
-
-    status = '200 OK'
-    response_headers = [('Content-type', 'text/plain')]
-    start_response(status, response_headers)
-
-    return ["Success".encode('utf-8')]
-
-
-@pytest.fixture()
-def goodserver(request):
-    """Defines the testserver funcarg"""
-    global request_sent
-    request_sent = False
-
-    global requested_url
-    requested_url = None
-
-    server = WSGIServer(application=good_app)
-    server.start()
-    request.addfinalizer(server.stop)
-    return server
-
-#==============================================================================
-# A flaky HTTP Server that fails several times before it succeeds
-#==============================================================================
-
-global times_to_fail
-
-
-def failing_app(environ, start_response):
-    global times_to_fail
-    if times_to_fail <= 0:
-        global request_sent
-        request_sent = True
-
-        global requested_url
-        requested_url = environ['PATH_INFO']
-
-        status = '200 OK'
-        response_headers = [('Content-type', 'text/plain')]
-        start_response(status, response_headers)
-        return ["Success".encode('utf-8')]
-    else:
-        times_to_fail = times_to_fail - 1
-        status = '500 Internal Server Error'
-        response_headers = [('Content-type', 'text/plain')]
-        start_response(status, response_headers)
-        return ["Failure".encode('utf-8')]
-
-
-@pytest.fixture()
-def failingserver(request):
-    """Defines the testserver funcarg"""
-    global request_sent
-    request_sent = False
-
-    global requested_url
-    requested_url = None
-
-    server = WSGIServer(application=failing_app)
-    server.start()
-    request.addfinalizer(server.stop)
-    return server
-
-#==============================================================================
-# A slow HTTP Server that sleeps for a while before succeeding
-#==============================================================================
-
-global sleep_time
-
-
-def slow_app(environ, start_response):
-    global request_sent
-    request_sent = True
-
-    global requested_url
-    requested_url = environ['PATH_INFO']
-
-    status = '200 OK'
-    response_headers = [('Content-type', 'text/plain')]
-    time.sleep(sleep_time)
-    start_response(status, response_headers)
-    return ["Success".encode('utf-8')]
-
-
-@pytest.fixture()
-def slowserver(request):
-    global request_sent
-    request_sent = False
-
-    global requested_url
-    requested_url = None
-
-    server = WSGIServer(application=slow_app)
-    server.start()
-    request.addfinalizer(server.stop)
-    return server
 
 #==============================================================================
 # Unit Tests
@@ -188,90 +77,116 @@ def test_publish_success_if_success_url_is_given():
 #------------------------------------------------------------------------------
 
 
-def test_publishes_success(goodserver):
-    publisher = HttpPublisher(name="Test", url=goodserver.url,
+def goodserver_monkeypatch(monkeypatch):
+    mock = MockRequestsCall()
+    monkeypatch.setattr(requests, "request", mock.request)
+    return mock
+
+
+def test_publishes_success(monkeypatch):
+    mock = goodserver_monkeypatch(monkeypatch)
+    publisher = HttpPublisher(name="Test", url=mock.host,
                               publish_successes=True)
     publisher.send(Success("success",
                            Validation("validation", priority=Priority.NORMAL),
                            "description"))
-    assert request_sent
+    assert mock.successes == 1
 
 
-def test_does_not_publish_success(goodserver):
-    publisher = HttpPublisher(name="Test", url=goodserver.url,
+def test_does_not_publish_success(monkeypatch):
+    mock = goodserver_monkeypatch(monkeypatch)
+    publisher = HttpPublisher(name="Test", url=mock.host,
                               publish_successes=False)
     publisher.send(Success("success",
                            Validation("validation", priority=Priority.NORMAL),
                            "description"))
-    assert not request_sent
+    assert mock.calls == 0
 
 
-def test_publishes_success_to_correct_url(goodserver):
+def test_publishes_success_to_correct_url(monkeypatch):
+    mock = goodserver_monkeypatch(monkeypatch)
     publisher = HttpPublisher(name="Test",
-                              success_url=goodserver.url + '/success',
-                              failure_url=goodserver.url + '/failure',
+                              success_url=mock.host + '/success',
+                              failure_url=mock.host + '/failure',
                               publish_successes=True)
     publisher.send(Success("success",
                            Validation("validation", priority=Priority.NORMAL),
                            "description"))
-    assert request_sent
-    assert requested_url == '/success'
+    assert mock.successes == 1
+    assert mock.last_url == '/success'
 
 
-def test_publishes_failure_to_correct_url(goodserver):
+def test_publishes_failure_to_correct_url(monkeypatch):
+    mock = goodserver_monkeypatch(monkeypatch)
     publisher = HttpPublisher(name="Test",
-                              success_url=goodserver.url + '/success',
-                              failure_url=goodserver.url + '/failure',
+                              success_url=mock.host + '/success',
+                              failure_url=mock.host + '/failure',
                               publish_successes=True)
     publisher.send(Failure("failure",
                            Validation("validation", priority=Priority.NORMAL),
                            "description"))
-    assert request_sent
-    assert requested_url == '/failure'
+    assert mock.successes == 1
+    assert mock.last_url == '/failure'
 
 #------------------------------------------------------------------------------
 # Publishing to failing servers
 #------------------------------------------------------------------------------
 
 
-def test_not_enough_attempts(failingserver):
-    global times_to_fail
-    times_to_fail = 3
+def failserver_monkeypatch(monkeypatch, fail_count):
+    mock = MockRequestsCall(fail_first=fail_count)
+    monkeypatch.setattr(requests, "request", mock.request)
+    return mock
 
-    publisher = HttpPublisher(name="Test", url=failingserver.url, attempts=3)
+
+def test_not_enough_attempts(monkeypatch):
+    times_to_fail = 3
+    mock = failserver_monkeypatch(monkeypatch, times_to_fail)
+
+    publisher = HttpPublisher(name="Test", url=mock.host, attempts=3)
 
     with pytest.raises(PublishFailure):
         publisher.send(Failure("failure",
                                Validation("validation",
                                           priority=Priority.NORMAL),
                                "description"))
+    mock.calls == 3
+    mock.successes == 0
 
 
-def test_enough_attempts(failingserver):
-    global times_to_fail
+def test_enough_attempts(monkeypatch):
     times_to_fail = 2
+    mock = failserver_monkeypatch(monkeypatch, times_to_fail)
 
     publisher = HttpPublisher(name="Test",
-                              url=failingserver.url + '/failure', attempts=3)
+                              url=mock.host + '/failure', attempts=3)
 
     publisher.send(Failure("failure",
                            Validation("validation", priority=Priority.NORMAL),
                            "description"))
 
-    assert request_sent
-    assert requested_url == '/failure'
+    assert mock.successes == 1
+    assert mock.calls == 3
+    assert mock.last_url == '/failure'
+
 
 #------------------------------------------------------------------------------
 # Publishing to slow servers
 #------------------------------------------------------------------------------
 
 
-def test_timeout_too_short(slowserver):
-    global sleep_time
+def slowserver_monkeypatch(monkeypatch, response_time):
+    mock = MockRequestsCall(response_time=response_time)
+    monkeypatch.setattr(requests, "request", mock.request)
+    return mock
+
+
+def test_timeout_too_short(monkeypatch):
     sleep_time = 2
+    mock = slowserver_monkeypatch(monkeypatch, sleep_time)
 
     publisher = HttpPublisher(name="Test",
-                              url=slowserver.url,
+                              url=mock.host,
                               timeout_seconds=1)
 
     with pytest.raises(PublishFailure):
@@ -281,17 +196,17 @@ def test_timeout_too_short(slowserver):
                                "description"))
 
 
-def test_timeout_too_short(slowserver):
-    global sleep_time
+def test_timeout_too_short(monkeypatch):
     sleep_time = 2
+    mock = slowserver_monkeypatch(monkeypatch, sleep_time)
 
     publisher = HttpPublisher(name="Test",
-                              url=slowserver.url + '/failure',
+                              url=mock.host + '/failure',
                               timeout_seconds=3)
 
     publisher.send(Failure("failure",
                            Validation("validation",
                                       priority=Priority.NORMAL),
                            "description"))
-    assert request_sent
-    assert requested_url == '/failure'
+    assert mock.successes == 1
+    assert mock.last_url == '/failure'
