@@ -1,9 +1,9 @@
 """HTTP Validation"""
 import time
-import urlparse
 import os
 import requests
 import copy
+import six.moves.urllib.parse as urlparse
 
 from alarmageddon.validations.validation import Validation, Priority
 from alarmageddon.validations.json_expectations import \
@@ -148,7 +148,7 @@ class HttpValidation(Validation):
 
     def perform(self, group_failures):
         """Perform the HTTP request and validate the response."""
-        for i in xrange(self._retries):
+        for i in range(self._retries):
             logger.debug("Attempt {} for {} {}".format(i, self._method, self._url))
             try:
                 resp = requests.request(
@@ -159,7 +159,7 @@ class HttpValidation(Validation):
                 self._elapsed_time = resp.elapsed.total_seconds()
                 self._check_expectations(resp)
                 break
-            except Exception, ex:
+            except Exception as ex:
                 if type(ex) is requests.exceptions.ReadTimeout:
                     self._elapsed_time = self.timeout
                 if i == self._retries - 1:

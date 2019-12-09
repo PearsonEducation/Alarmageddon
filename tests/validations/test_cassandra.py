@@ -8,6 +8,7 @@ from alarmageddon.validations.cassandra import State
 from alarmageddon.validations.exceptions import ValidationFailure
 import pytest
 from validation_mocks import get_mock_key_file, get_mock_ssh_text
+from fabric import Connection
 
 _CLUSTER_NAME='finance dept'
 
@@ -28,13 +29,11 @@ UN  10.168.4.72    83.75 GB   256     21.2%  dc8cbbdc-d95f-4836-884e-2e12f4adb13
 def test_cassandra_success(monkeypatch, tmpdir):
     ssh_ctx = ssh.SshContext("ubuntu", get_mock_key_file(tmpdir))
     text = HEALTHY_OUTPUT
-    monkeypatch.setattr(ssh, "run",
-                        lambda x: get_mock_ssh_text(text, 0))
-    monkeypatch.setattr(cassandra, "run",
-                        lambda x: get_mock_ssh_text(text, 0))
+    monkeypatch.setattr(Connection, "run",
+                        lambda self, x, warn: get_mock_ssh_text(text, 0))
 
     (cassandra.CassandraStatusValidation(ssh_ctx, hosts=["127.0.0.1"],
-                                            cluster_name=_CLUSTER_NAME)
+                                         cluster_name=_CLUSTER_NAME)
      .perform({}))
 
 # For testing this bug: https://issues.apache.org/jira/browse/CASSANDRA-10176
@@ -58,13 +57,11 @@ Note: Non-system keyspaces don't have the same replication settings, effective o
 def test_cassandra_success_with_question_marks_in_owns(monkeypatch, tmpdir):
     ssh_ctx = ssh.SshContext("ubuntu", get_mock_key_file(tmpdir))
     text = QUESTION_MARK_OUTPUT
-    monkeypatch.setattr(ssh, "run",
-                        lambda x: get_mock_ssh_text(text, 0))
-    monkeypatch.setattr(cassandra, "run",
-                        lambda x: get_mock_ssh_text(text, 0))
+    monkeypatch.setattr(Connection, "run",
+                        lambda self, x, warn: get_mock_ssh_text(text, 0))
 
     (cassandra.CassandraStatusValidation(ssh_ctx, hosts=["127.0.0.1"],
-                                             cluster_name=_CLUSTER_NAME)
+                                         cluster_name=_CLUSTER_NAME)
      .perform({}))
 
 
@@ -84,16 +81,14 @@ UN  10.168.4.72    83.75 GB   256     21.2   dc8cbbdc-d95f-4836-884e-2e12f4adb13
 
 
 def test_cassandra_success_without_percent_signs(monkeypatch, tmpdir):
-     ssh_ctx = ssh.SshContext("ubuntu", get_mock_key_file(tmpdir))
-     text = HEALTHY_OUTPUT_WITHOUT_PERCENT_SIGNS
-     monkeypatch.setattr(ssh, "run",
-                         lambda x: get_mock_ssh_text(text, 0))
-     monkeypatch.setattr(cassandra, "run",
-                         lambda x: get_mock_ssh_text(text, 0))
+    ssh_ctx = ssh.SshContext("ubuntu", get_mock_key_file(tmpdir))
+    text = HEALTHY_OUTPUT_WITHOUT_PERCENT_SIGNS
+    monkeypatch.setattr(Connection, "run",
+                        lambda self, x, warn: get_mock_ssh_text(text, 0))
 
-     (cassandra.CassandraStatusValidation(ssh_ctx, hosts=["127.0.0.1"],
-                                              cluster_name=_CLUSTER_NAME)
-      .perform({}))
+    (cassandra.CassandraStatusValidation(ssh_ctx, hosts=["127.0.0.1"],
+                                         cluster_name=_CLUSTER_NAME)
+     .perform({}))
 
 
 SERVER_DOWN_OUTPUT = """xss =  -ea -javaagent:/usr/share/cassandra/lib/jamm-0.2.5.jar -XX:+UseThreadPriorities -XX:ThreadPriorityPolicy=42 -Xms10240m -Xmx10240m -Xmn2048m -XX:+HeapDumpOnOutOfMemoryError -Xss256k
@@ -113,10 +108,8 @@ DN  10.168.4.72    83.75 GB   256     21.2%  dc8cbbdc-d95f-4836-884e-2e12f4adb13
 def test_cassandra_down(monkeypatch, tmpdir):
     ssh_ctx = ssh.SshContext("ubuntu", get_mock_key_file(tmpdir))
     text = SERVER_DOWN_OUTPUT
-    monkeypatch.setattr(ssh, "run",
-                        lambda x: get_mock_ssh_text(text, 0))
-    monkeypatch.setattr(cassandra, "run",
-                        lambda x: get_mock_ssh_text(text, 0))
+    monkeypatch.setattr(Connection, "run",
+                        lambda self, x, warn: get_mock_ssh_text(text, 0))
 
     with pytest.raises(ValidationFailure):
         (cassandra.CassandraStatusValidation(ssh_ctx, hosts=["127.0.0.1"],
@@ -141,15 +134,13 @@ UN  10.168.4.72    83.75 GB   256     11.2%  dc8cbbdc-d95f-4836-884e-2e12f4adb13
 def test_cassandra_threshold(monkeypatch, tmpdir):
     ssh_ctx = ssh.SshContext("ubuntu", get_mock_key_file(tmpdir))
     text = UNBALANCED_RING_OUTPUT
-    monkeypatch.setattr(ssh, "run",
-                        lambda x: get_mock_ssh_text(text, 0))
-    monkeypatch.setattr(cassandra, "run",
-                        lambda x: get_mock_ssh_text(text, 0))
+    monkeypatch.setattr(Connection, "run",
+                        lambda self, x, warn: get_mock_ssh_text(text, 0))
 
     with pytest.raises(ValidationFailure):
         (cassandra.CassandraStatusValidation(ssh_ctx, owns_threshold=40,
-                                                 hosts=["127.0.0.1"],
-                                                 cluster_name=_CLUSTER_NAME)
+                                             hosts=["127.0.0.1"],
+                                             cluster_name=_CLUSTER_NAME)
          .perform({}))
 
 
@@ -168,14 +159,12 @@ UN  10.168.4.72    83.75 GB   256     21.2%   dc8cbbdc-d95f-4836-884e-2e12f4adb1
 
 
 def test_cassandra_success_with_percent_signs(monkeypatch, tmpdir):
-     ssh_ctx = ssh.SshContext("ubuntu", get_mock_key_file(tmpdir))
-     text = UNHEALTHY_OUTPUT_WITH_PERCENT_SIGNS
-     monkeypatch.setattr(ssh, "run",
-                         lambda x: get_mock_ssh_text(text, 0))
-     monkeypatch.setattr(cassandra, "run",
-                         lambda x: get_mock_ssh_text(text, 0))
+    ssh_ctx = ssh.SshContext("ubuntu", get_mock_key_file(tmpdir))
+    text = UNHEALTHY_OUTPUT_WITH_PERCENT_SIGNS
+    monkeypatch.setattr(Connection, "run",
+                        lambda self, x, warn: get_mock_ssh_text(text, 0))
 
-     with pytest.raises(ValidationFailure):
+    with pytest.raises(ValidationFailure):
         (cassandra.CassandraStatusValidation(ssh_ctx, owns_threshold=40,
                                              hosts=["127.0.0.1"])
          .perform({}))
@@ -197,10 +186,8 @@ UN  10.168.4.72    83.75 GB   256     21.2%  dc8cbbdc-d95f-4836-884e-2e12f4adb13
 def test_cassandra_node_count(monkeypatch, tmpdir):
     ssh_ctx = ssh.SshContext("ubuntu", get_mock_key_file(tmpdir))
     text = MISSING_NODE_OUTPUT
-    monkeypatch.setattr(ssh, "run",
-                        lambda x: get_mock_ssh_text(text, 0))
-    monkeypatch.setattr(cassandra, "run",
-                        lambda x: get_mock_ssh_text(text, 0))
+    monkeypatch.setattr(Connection, "run",
+                        lambda self, x, warn: get_mock_ssh_text(text, 0))
 
     with pytest.raises(ValidationFailure):
         (cassandra.CassandraStatusValidation(ssh_ctx, number_nodes=5,
@@ -212,10 +199,8 @@ def test_cassandra_node_count(monkeypatch, tmpdir):
 def test_no_cassandra(monkeypatch, tmpdir):
     ssh_ctx = ssh.SshContext("ubuntu", get_mock_key_file(tmpdir))
     text = "Error connecting to remote JMX agent!"
-    monkeypatch.setattr(ssh, "run",
-                        lambda x: get_mock_ssh_text(text, 0))
-    monkeypatch.setattr(cassandra, "run",
-                        lambda x: get_mock_ssh_text(text, 0))
+    monkeypatch.setattr(Connection, "run",
+                        lambda self, x, warn: get_mock_ssh_text(text, 0))
 
     with pytest.raises(ValidationFailure):
         (cassandra.CassandraStatusValidation(ssh_ctx, number_nodes=5,
@@ -231,10 +216,8 @@ def test_stack_trace(monkeypatch, tmpdir):
     [10.198.10.174] out: 	at org.apache.cassandra.service.StorageService.getOwnership(StorageService.java:3512)
     [10.198.10.174] out: 	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
     """
-    monkeypatch.setattr(ssh, "run",
-                        lambda x: get_mock_ssh_text(text, 0))
-    monkeypatch.setattr(cassandra, "run",
-                        lambda x: get_mock_ssh_text(text, 0))
+    monkeypatch.setattr(Connection, "run",
+                        lambda self, x, warn: get_mock_ssh_text(text, 0))
 
     with pytest.raises(ValidationFailure):
         (cassandra.CassandraStatusValidation(ssh_ctx, number_nodes=4,
@@ -260,14 +243,12 @@ UN  10.168.4.72    83.75 GB   256     21.2%  dc8cbbdc-d95f-4836-884e-2e12f4adb13
 def test_ignore_joining_nodes(monkeypatch, tmpdir):
     ssh_ctx = ssh.SshContext("ubuntu", get_mock_key_file(tmpdir))
     text = JOINING_NODE_OUTPUT
-    monkeypatch.setattr(ssh, "run",
-                        lambda x: get_mock_ssh_text(text, 0))
-    monkeypatch.setattr(cassandra, "run",
-                        lambda x: get_mock_ssh_text(text, 0))
+    monkeypatch.setattr(Connection, "run",
+                        lambda self, x, warn: get_mock_ssh_text(text, 0))
 
     (cassandra.CassandraStatusValidation(ssh_ctx, number_nodes=4,
-                                             hosts=["127.0.0.1"],
-                                             cluster_name=_CLUSTER_NAME)
+                                         hosts=["127.0.0.1"],
+                                         cluster_name=_CLUSTER_NAME)
      .perform({}))
 
 
@@ -277,14 +258,12 @@ def test_extra_nodes(monkeypatch, tmpdir):
     """
     ssh_ctx = ssh.SshContext("ubuntu", get_mock_key_file(tmpdir))
     text = HEALTHY_OUTPUT
-    monkeypatch.setattr(ssh, "run",
-                        lambda x: get_mock_ssh_text(text, 0))
-    monkeypatch.setattr(cassandra, "run",
-                        lambda x: get_mock_ssh_text(text, 0))
+    monkeypatch.setattr(Connection, "run",
+                        lambda self, x, warn: get_mock_ssh_text(text, 0))
 
     (cassandra.CassandraStatusValidation(ssh_ctx, number_nodes=4,
-                                             hosts=["127.0.0.1"],
-                                             cluster_name=_CLUSTER_NAME)
+                                         hosts=["127.0.0.1"],
+                                         cluster_name=_CLUSTER_NAME)
      .perform({}))
 
 
@@ -361,7 +340,7 @@ def test_can_parse_nodes_missing_tokens():
 def test_tokens_are_none():
     parser = cassandra.NodetoolStatusParser()
     nodes = parser.parse(OUTPUT_MISSING_TOKENS)
-    assert nodes[0].tokens == None
+    assert nodes[0].tokens is None
 
 
 OUTPUT_MISSING_OWNERSHIP = """xss =  -ea -javaagent:/usr/share/cassandra/lib/jamm-0.2.5.jar -XX:+UseThreadPriorities -XX:ThreadPriorityPolicy=42 -Xms10240m -Xmx10240m -Xmn2048m -XX:+HeapDumpOnOutOfMemoryError -Xss256k
@@ -387,7 +366,7 @@ def test_can_parse_nodes_missing_ownership():
 def test_ownership_is_none():
     parser = cassandra.NodetoolStatusParser()
     nodes = parser.parse(OUTPUT_MISSING_OWNERSHIP)
-    assert nodes[0].owns == None
+    assert nodes[0].owns is None
 
 
 MINIMAL_OUTPUT = """--  Address        Load       Tokens  Owns   Host ID                               Rack
@@ -449,36 +428,30 @@ UN  10.168.4.72    83.75 GB   256     0.0%   dc8cbbdc-d95f-4836-884e-2e12f4adb13
 def test_zero_ownership_should_not_fail(monkeypatch, tmpdir):
     ssh_ctx = ssh.SshContext("ubuntu", get_mock_key_file(tmpdir))
     text = ZERO_OWNERSHIP_OUTPUT
-    monkeypatch.setattr(ssh, "run",
-                        lambda x: get_mock_ssh_text(text, 0))
-    monkeypatch.setattr(cassandra, "run",
-                        lambda x: get_mock_ssh_text(text, 0))
+    monkeypatch.setattr(Connection, "run",
+                        lambda self, x, warn: get_mock_ssh_text(text, 0))
 
     (cassandra.CassandraStatusValidation(ssh_ctx, hosts=["127.0.0.1"],
-                                             cluster_name=_CLUSTER_NAME)
+                                         cluster_name=_CLUSTER_NAME)
      .perform({}))
 
 
 def test_repr(monkeypatch, tmpdir):
     ssh_ctx = ssh.SshContext("ubuntu", get_mock_key_file(tmpdir))
     text = ZERO_OWNERSHIP_OUTPUT
-    monkeypatch.setattr(ssh, "run",
-                        lambda x: get_mock_ssh_text(text, 0))
-    monkeypatch.setattr(cassandra, "run",
-                        lambda x: get_mock_ssh_text(text, 0))
+    monkeypatch.setattr(Connection, "run",
+                        lambda self, x, warn: get_mock_ssh_text(text, 0))
 
     (cassandra.CassandraStatusValidation(ssh_ctx, hosts=["127.0.0.1"],
-                                             cluster_name=_CLUSTER_NAME)
+                                         cluster_name=_CLUSTER_NAME)
      .__repr__())
 
 
 def test_str(monkeypatch, tmpdir):
     ssh_ctx = ssh.SshContext("ubuntu", get_mock_key_file(tmpdir))
     text = ZERO_OWNERSHIP_OUTPUT
-    monkeypatch.setattr(ssh, "run",
-                        lambda x: get_mock_ssh_text(text, 0))
-    monkeypatch.setattr(cassandra, "run",
-                        lambda x: get_mock_ssh_text(text, 0))
+    monkeypatch.setattr(Connection, "run",
+                        lambda self, x, warn: get_mock_ssh_text(text, 0))
 
     str(cassandra.CassandraStatusValidation(ssh_ctx, hosts=["127.0.0.1"],
-                                             cluster_name=_CLUSTER_NAME))
+                                            cluster_name=_CLUSTER_NAME))

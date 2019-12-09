@@ -13,6 +13,8 @@ from alarmageddon.validations.graphite_expectations import \
 
 import logging
 
+import six
+
 logger = logging.getLogger(__name__)
 
 
@@ -142,7 +144,7 @@ class GraphiteValidation(Validation):
         if len(chunks) == 2:
             readings = []
             for tok in chunks[1].split(','):
-                if tok == u'None':
+                if tok == six.u('None'):
                     readings.append(None)
                 else:
                     readings.append(float(tok))

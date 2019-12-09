@@ -1,6 +1,16 @@
-from fabric.operations import _AttributeString
 from alarmageddon.validations.validation import Validation
 import time
+
+
+class _AttributeString(str):
+    """
+    Simple string subclass to allow arbitrary attribute access.
+
+    Stolen from fabric1
+    """
+    @property
+    def stdout(self):
+        return str(self)
 
 
 def get_mock_key_file(tmpdir):

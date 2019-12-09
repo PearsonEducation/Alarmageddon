@@ -1,7 +1,5 @@
 """Convenience Validations for working with Cassandra"""
 
-from fabric.operations import run
-
 from alarmageddon.validations.validation import Priority
 from alarmageddon.validations.ssh import SshValidation
 
@@ -132,7 +130,7 @@ class Status(object):
     """An enum-like object that represents the status of a Cassandra Node
 
     """
-    UNKNOWN, UP, DOWN = range(3)
+    UNKNOWN, UP, DOWN = list(range(3))
 
     @staticmethod
     def from_text(text):
@@ -158,7 +156,7 @@ class State(object):
     """An enum-like object that represents the state of a Cassandra Node
 
     """
-    UNKNOWN, NORMAL, LEAVING, JOINING, MOVING = range(5)
+    UNKNOWN, NORMAL, LEAVING, JOINING, MOVING = list(range(5))
 
     @staticmethod
     def from_text(text):
@@ -393,9 +391,10 @@ class CassandraStatusValidation(SshValidation):
         self.owns_threshold = owns_threshold
         self.cluster_name = cluster_name
 
-    def perform_on_host(self, host):
+    def perform_on_host(self, connection):
         """Runs nodetool status and parses the output."""
-        output = run('nodetool status')
+        output = connection.run('nodetool status', warn=True)
+        host = connection.host
 
         if "Exception" in output:
             self.fail_on_host(host, ("An exception occurred while " +

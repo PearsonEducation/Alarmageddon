@@ -73,7 +73,7 @@ class PagerDutyPublisher(Publisher):
         #and here
         message = str(type(validation)) + str(validation.__dict__)
         hasher = hashlib.md5()
-        hasher.update(message)
+        hasher.update(message.encode('utf-8'))
         pagerduty_id = hasher.hexdigest()
 
         logger.debug("Generated id {} for {}".format(pagerduty_id, result))
@@ -113,7 +113,7 @@ class PagerDutyPublisher(Publisher):
 
             #exponential backoff
             logger.debug("Sending send {}".format(result))
-            for i in xrange(4):
+            for i in range(4):
                 resp = requests.post(self._api_end_point,
                                      data=data, headers=headers, stream=True)
 

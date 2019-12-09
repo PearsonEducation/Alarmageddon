@@ -1,7 +1,5 @@
 """Convenience Validations for working with Kafka"""
 
-from fabric.operations import run
-
 from alarmageddon.validations.validation import Priority
 from alarmageddon.validations.ssh import SshValidation
 
@@ -51,12 +49,13 @@ class KafkaStatusValidation(SshValidation):
         self.zookeeper_nodes = zookeeper_nodes
         self.cluster_name = cluster_name
 
-    def perform_on_host(self, host):
+    def perform_on_host(self, connection):
         """Runs kafka list topic command on host"""
-        output = run(
+        host = connection.host
+        output = connection.run(
             self.kafka_list_topic_command +
             " --zookeeper " +
-            self.zookeeper_nodes)
+            self.zookeeper_nodes, warn=True)
 
         error_patterns = [
             'No such file', 'Missing required argument', 'Exception']
@@ -68,11 +67,11 @@ class KafkaStatusValidation(SshValidation):
                                                              host),
                                              output))
         parsed = re.split(r'\t|\n', output)
-        topics = [parsed[i] for i in xrange(0, len(parsed), 5)]
-        leaders = [parsed[i] for i in xrange(2, len(parsed), 5)]
+        topics = [parsed[i] for i in range(0, len(parsed), 5)]
+        leaders = [parsed[i] for i in range(2, len(parsed), 5)]
 
-        tuples = zip(topics, leaders)
-        duplicates = [x for x, y in Counter(tuples).items() if y > 1]
+        tuples = list(zip(topics, leaders))
+        duplicates = [x for x, y in list(Counter(tuples).items()) if y > 1]
 
         if len(duplicates) != 0:
             duplicates_str =", ".join("%s has %s" %

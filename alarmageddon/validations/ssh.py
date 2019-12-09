@@ -5,15 +5,14 @@ We're using fabric for easy SSH command execution.
 
 """
 
+import sys
 import os
 import time
 import re
 import pytest
 import warnings
-from fabric.operations import run, sudo
-from fabric.exceptions import CommandTimeout
-from fabric.context_managers import settings
-from fabric.network import disconnect_all
+import paramiko
+from fabric import Connection
 from alarmageddon.validations.validation import Validation, Priority
 
 import logging
@@ -45,7 +44,7 @@ class SshContext(object):
         """return a string representation of an SshContext object"""
         return "SSH Context {{ User: {0}, Key File: {1} }}"\
             .format(self.user, self.key_file)
-    
+
     def __repr__(self):
         return "{}: {} {}".format(type(self).__name__, self.user, self.key_file)
 
@@ -58,8 +57,7 @@ class SshValidation(Validation):
                  group=None, connection_retries=0,
                  hosts=None):
         """Creates an SshValidation object"""
-        Validation.__init__(self,
-            name, priority, timeout, group=group)
+        Validation.__init__(self, name, priority, timeout, group=group)
         self.context = ssh_context
         if hosts is not None:
             self.hosts = hosts
@@ -82,42 +80,42 @@ class SshValidation(Validation):
         if not self.hosts:
             self.fail("no hosts specified.")
 
+        ssh_kwargs = {"key_filename": self.context.key_file}
+
         #now we can add our default expectation
         self.expectations.append(self._exit_code_expectation)
 
         for host in self.hosts:
-            with settings(warn_only=True,
-                          host_string=host,
-                          user=self.context.user,
-                          key_filename=self.context.key_file):
-                try:
-                    for i in xrange(self.retries + 1):
-                        try:
-                            self.perform_on_host(host)
-                            break
-                        except CommandTimeout, ex:
-                            #we connected, so don't retry
+            with Connection(host=host, user=self.context.user, connect_kwargs=ssh_kwargs) as connection:
+                for i in range(self.retries + 1):
+                    try:
+                        self.perform_on_host(connection)
+                        break
+                    except paramiko.SSHException as ex:
+                        # TODO: Paramiko doesn't surface a separate sort of exception
+                        # for timeouts like fabric1 did. This probably needs more logic
+                        # to not catch issues that could allow for retrying
+
+                        # we connected, so don't retry
+                        self.fail_on_host(
+                            host,
+                            "SSH Command timed out: {0}".format(str(ex)))
+                    except Exception as ex:
+                        if i >= self.retries:
                             self.fail_on_host(
                                 host,
-                                "SSH Command timed out: {0}".format(str(ex)))
-                        except Exception, ex:
-                            if i >= self.retries:
-                                self.fail_on_host(
-                                    host,
-                                    "SSH Command Exception: {0}"
-                                    .format(str(ex)))
-                                time.sleep(2)
-                finally:
-                    disconnect_all()
+                                "SSH Command Exception: {0}"
+                                .format(str(ex)))
+                            time.sleep(2)
 
     def fail_on_host(self, host, reason):
         """signal failure the test on a particular host"""
         self.fail("[{0}] {1}".format(host, reason))
 
-    def perform_on_host(self, host):
+    def perform_on_host(self, connection):
         """perform a validation against a particular host"""
         self.fail_on_host(
-            host, "perform_on_host must be overriden by derived classes")
+            connection.host, "perform_on_host must be overriden by derived classes")
 
     def add_expectation(self, expectation):
         """Adds an expectation deriving from SshCommandExpectation to the list
@@ -176,21 +174,21 @@ class SshCommandValidation(SshValidation):
         self.use_sudo = use_sudo
         self.expectations = []
 
-    def perform_on_host(self, host):
+    def perform_on_host(self, connection):
         """Runs the SSH Command on a host and checks to see if all expectations
         are met.
 
         """
         if self.use_sudo:
-            output = sudo(self.command,
-                          combine_stderr=True, timeout=self.timeout)
+            output = connection.sudo(self.command, err_stream=sys.stdout,
+                                     timeout=self.timeout, warn=True)
         else:
-            output = run(self.command,
-                         combine_stderr=True, timeout=self.timeout)
-        logger.info("Got output {} from host {}".format(output, host))
+            output = connection.run(self.command, err_stream=sys.stdout,
+                                    timeout=self.timeout, warn=True)
+        logger.info("Got output {} from host {}".format(output, connection.host))
         exit_code = output.return_code
         for expectation in self.expectations:
-            expectation.validate(self, host, output, exit_code)
+            expectation.validate(self, connection.host, output.stdout, exit_code)
 
 
 class UpstartServiceValidation(SshCommandValidation):
@@ -261,16 +259,16 @@ class LoadAverageValidation(SshValidation):
         self.limits[15]['max'] = max_load
         return self
 
-    def perform_on_host(self, host):
+    def perform_on_host(self, connection):
         """Runs the SSH Command on a host and checks to see if all expectations
         are met.
 
         """
-        (load_1, load_5, load_15) = SshCommands.get_uptime()
+        (load_1, load_5, load_15) = SshCommands.get_uptime(connection)
 
-        self.check(host, 1, load_1)
-        self.check(host, 5, load_5)
-        self.check(host, 15, load_15)
+        self.check(connection.host, 1, load_1)
+        self.check(connection.host, 5, load_5)
+        self.check(connection.host, 15, load_15)
 
     def check(self, host, minutes, load):
         """Make sure that the n-minute load average for the given host is
@@ -426,14 +424,14 @@ class SshCommands(object):
         pass
 
     @staticmethod
-    def get_cpu_count():
+    def get_cpu_count(connection):
         """return the number of processors on the server"""
-        return int(run("grep processor /proc/cpuinfo | wc -l"))
+        return int(connection.run("grep processor /proc/cpuinfo | wc -l"), warn=True)
 
     @staticmethod
-    def get_uptime():
+    def get_uptime(connection):
         """return the system uptime"""
-        output = run("uptime")
+        output = connection.run("uptime", warn=True)
         match = UPTIME_REGEX.search(output)
         if match:
             return (float(match.group(1)),

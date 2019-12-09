@@ -21,7 +21,7 @@ def test_str(env):
 def test_reporter_correctly_sends_success(env, valid):
     reporter = env["reporter"]
     publishers = []
-    for i in xrange(10):
+    for i in range(10):
         publishers.append(MockPublisher())
     reporter.publishers = publishers
     reporter.collect(Success("success", Validation("valid")))
@@ -34,7 +34,7 @@ def test_reporter_correctly_sends_success(env, valid):
 def test_reporter_correctly_sends_failures(env, valid):
     reporter = env["reporter"]
     publishers = []
-    for i in xrange(10):
+    for i in range(10):
         publishers.append(MockPublisher())
     reporter.publishers = publishers
     reporter.collect(Failure("failed", Validation("valid"), "why it failed"))
@@ -47,7 +47,7 @@ def test_reporter_correctly_sends_failures(env, valid):
 def test_reporter_correctly_batches(env):
     reporter = env["reporter"]
     publishers = []
-    for i in xrange(10):
+    for i in range(10):
         publishers.append(MockPublisher())
     reporter.publishers = publishers
     reporter.collect(Failure("failed", Validation("valid"), "why it failed"))
@@ -63,7 +63,7 @@ def test_reporter_runs_all_publishers_before_raising(env, valid):
     reporter = env["reporter"]
     bad_pub = 5
     publishers = []
-    for i in xrange(10):
+    for i in range(10):
         publishers.append(MockPublisher())
     publishers[bad_pub] = FailingPublisher()
     reporter.publishers = publishers
@@ -82,5 +82,5 @@ def test_reporter_shows_publish_error_info(env):
     reporter.collect(Success("success", Validation("valid")))
     try:
         reporter.report()
-    except ReportingFailure,e:
+    except ReportingFailure as e:
         assert "NOT_HIDDEN" in str(e) 

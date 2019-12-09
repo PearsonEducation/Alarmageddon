@@ -125,7 +125,7 @@ def _run_validations(validations, reporter, processes=1, timeout=60, timeout_ret
         immutable_group_failures = dict(group_failures)
         results = manager.list()
         for valid in order_set:
-            for i in xrange(timeout_retries):
+            for i in range(timeout_retries):
                 #TODO: parallelize
                 p = multiprocessing.Process(target=_perform, args=(valid, immutable_group_failures, results))
                 p.start()
@@ -171,7 +171,7 @@ def _perform(validation, immutable_group_failures, results):
         else:
             result = Success(validation.name, validation,
                              time=runtime)
-    except Exception, e:
+    except Exception as e:
         result = Failure(validation.name, validation, str(e),
                          time=time.time() - start)
 
@@ -192,15 +192,15 @@ def do_dry_run(validations, publishers):
 
     """
     dry_run = _compute_dry_run(validations, publishers)
-    publishers = dry_run.keys()
+    publishers = list(dry_run.keys())
     for publisher in sorted(
             publishers, reverse=True,
-            key=lambda x: x.priority_threshold):
-        print("Publisher: %s (threshold: %s)" % (
-            publisher.name(), Priority.string(publisher.priority_threshold)))
+            key=lambda x: x.priority_threshold if x.priority_threshold is not None else -1):
+        print(("Publisher: %s (threshold: %s)" % (
+            publisher.name(), Priority.string(publisher.priority_threshold))))
         for validation in dry_run[publisher]:
-            print("   %s (priority: %s)" % (
-                validation.name, Priority.string(validation.priority)))
+            print(("   %s (priority: %s)" % (
+                validation.name, Priority.string(validation.priority))))
 
 
 def _compute_dry_run(validations, publishers):
