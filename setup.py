@@ -2,15 +2,15 @@ from setuptools import setup
 setup(
         name = "Alarmageddon",
         description = "Automated testing and reporting",
-        version = "1.1.0",
+        version = "1.1.1",
         author = "Tim Stewart, Scott Hellman",
         author_email = "timothy.stewart@pearson.com, scott.hellman@pearson.com",
-        url = "https://github.com/PearsonEducation/Alarmageddon/tarball/1.1.0",
+        url = "https://github.com/PearsonEducation/Alarmageddon/tarball/1.1.1",
         license = "Apache2",
         classifiers=[
             "Development Status :: 5 - Production/Stable",
             "Programming Language :: Python :: 2.7",
-            "Programming Language :: Python :: 3.4"
+            "Programming Language :: Python :: 3.4",
             "License :: OSI Approved :: Apache Software License"
             ],
 

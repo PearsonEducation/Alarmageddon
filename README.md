@@ -108,7 +108,7 @@ Sends emails on test failure. The SimpleEmailPublisher will email the text of th
 Changelog
 =========
 
-1.1.0
+1.1.1
 * Python3 support
 * Address security vulnerability by upgrading Jinja to 2.10
 * Address security vulnerability by upgrading requests to 2.22
