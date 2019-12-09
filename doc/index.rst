@@ -5,7 +5,7 @@
 
 .. image:: ../logo.*
 
-Alarmageddon is a Python monitoring framework for RESTful services, built on top of Requests and Fabric.
+Alarmageddon is a Python monitoring framework for RESTful services, built on top of Requests and Fabric. Alarmageddon supports Python 2.7 and Python 3.4+
 
 The following example GETs www.google.com, and reports to HipChat if the return code is not 200::
 
