@@ -195,7 +195,7 @@ def do_dry_run(validations, publishers):
     publishers = list(dry_run.keys())
     for publisher in sorted(
             publishers, reverse=True,
-            key=lambda x: x.priority_threshold):
+            key=lambda x: x.priority_threshold if x.priority_threshold is not None else -1):
         print(("Publisher: %s (threshold: %s)" % (
             publisher.name(), Priority.string(publisher.priority_threshold))))
         for validation in dry_run[publisher]:
