@@ -86,18 +86,17 @@ class SshValidation(Validation):
         self.expectations.append(self._exit_code_expectation)
 
         for host in self.hosts:
-            # FIXME: need warn_only
             with Connection(host=host, user=self.context.user, connect_kwargs=ssh_kwargs) as connection:
                 for i in range(self.retries + 1):
                     try:
                         self.perform_on_host(connection)
                         break
                     except paramiko.SSHException as ex:
-                        # FIXME: Paramiko doesn't surface a separate sort of exception
+                        # TODO: Paramiko doesn't surface a separate sort of exception
                         # for timeouts like fabric1 did. This probably needs more logic
                         # to not catch issues that could allow for retrying
 
-                        #we connected, so don't retry
+                        # we connected, so don't retry
                         self.fail_on_host(
                             host,
                             "SSH Command timed out: {0}".format(str(ex)))

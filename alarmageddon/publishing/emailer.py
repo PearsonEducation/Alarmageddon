@@ -9,8 +9,6 @@ from jinja2 import Template, Environment, FileSystemLoader, Undefined
 
 import smtplib
 
-#from email.MIMEMultipart import MIMEMultipart
-#from email.MIMEText import MIMEText
 from six.moves.email_mime_text import MIMEText
 from six.moves.email_mime_multipart import MIMEMultipart
 from email import utils
