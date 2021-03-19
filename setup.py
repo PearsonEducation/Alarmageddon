@@ -18,7 +18,7 @@ setup(
                     "alarmageddon.publishing",
                     "alarmageddon.validations"],
         install_requires = ["fabric==2.5.0",
-                            "Jinja2==2.10.1",
+                            "Jinja2==2.11.3",
                             "requests==2.22.0",
                             "statsd==2.0.3",
                             "colorama==0.3.2",
